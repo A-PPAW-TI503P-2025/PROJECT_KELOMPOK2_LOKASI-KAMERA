@@ -1,29 +1,32 @@
-```mermaid
-flowchart TD
-    %% Node Shapes: ([Start/End]), [/Input/Output/], [Process], {Decision}, [(Database)]
+@startuml
+skinparam ConditionEndStyle hline
 
-    Start([Mulai]) --> Login[/User Login & Masuk Dashboard/]
-    Login --> ListBuku[/Pilih Menu Daftar Buku/]
-    ListBuku --> PilihBuku[/Pilih Buku yg Mau Dipinjam/]
-    
-    PilihBuku --> CekStok{Stok Tersedia?}
-    
-    CekStok -- Tidak --> StokHabis[/Tampilkan: Stok Habis/]
-    StokHabis --> ListBuku
-    
-    CekStok -- Ya --> ReqKamera[Request Izin Kamera]
-    
-    ReqKamera --> IzinCam{Izin Diberikan?}
-    IzinCam -- Tidak --> ErrCam[/Error: Kamera Wajib Aktif/]
-    ErrCam --> End([Selesai])
-    
-    IzinCam -- Ya --> BukaCam[Buka Kamera Viewfinder]
-    BukaCam --> Foto[/Ambil Foto Selfie/Bukti/]
-    Foto --> KlikPinjam[Klik Tombol Pinjam]
-    
-    KlikPinjam --> DB_Pinjam[(Simpan Data Peminjaman\n& Upload Foto)]
-    DB_Pinjam --> DB_Stok[(Kurangi Stok Buku)]
-    
-    DB_Stok --> Sukses[/Tampilkan: Peminjaman Berhasil/]
-    Sukses --> End
-```
+title Flowchart Peminjaman Buku (Sensor Kamera & Lokasi)
+
+start
+:User Login & Masuk Dashboard;
+:Pilih Menu Daftar Buku;
+:Pilih Buku yg Mau Dipinjam;
+
+if (Stok Tersedia?) then (Ya)
+    :Request Izin Kamera & Lokasi;
+    if (Izin Diberikan?) then (Ya)
+        :Buka Kamera Viewfinder;
+        :Ambil Foto Selfie & Koordinat GPS;
+        :Klik Tombol Pinjam;
+        partition "Database Process" {
+            :Simpan Data Peminjaman,\nFoto & Lokasi;
+            :Update Stok Buku;
+        }
+        :Tampilkan: Peminjaman Berhasil;
+    else (Tidak)
+        #pink:Error: Kamera & GPS Wajib Aktif;
+        detach
+    endif
+else (Tidak)
+    #pink:Tampilkan: Stok Habis;
+    :Kembali ke Daftar Buku;
+endif
+
+stop
+@enduml
