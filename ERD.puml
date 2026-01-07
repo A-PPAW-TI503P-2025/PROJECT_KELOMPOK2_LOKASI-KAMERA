@@ -1,0 +1,56 @@
+@startuml
+
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+hide circle
+skinparam linetype ortho
+
+' --- ENTITAS USER ---
+entity "User" as user {
+  *user_id : INT <<PK>>
+  --
+  nim : CHAR <<Unique, Nullable>>
+  nama : VARCHAR
+  email : VARCHAR
+  password : VARCHAR
+  role : ENUM('mahasiswa', 'admin')
+  created_at : TIMESTAMP
+}
+
+' --- ENTITAS BOOK ---
+entity "Book" as book {
+  *book_id : INT <<PK>>
+  --
+  title : VARCHAR
+  author : VARCHAR
+  publisher : VARCHAR
+  year : INT
+  category : VARCHAR
+  stock : INT
+  cover_image : VARCHAR
+  description : TEXT
+  created_at : TIMESTAMP
+}
+
+entity "Transaction" as trx {
+  *trans_id : INT <<PK>>
+  --
+  *user_id : INT <<FK>>
+  *book_id : INT <<FK>>
+  borrow_date : DATETIME
+  return_date : DATETIME
+  borrow_proof : VARCHAR
+  return_proof : VARCHAR
+  lat : DECIMAL
+  long : DECIMAL
+  status : ENUM
+}
+
+' --- RELASI ---
+user ||..o{ trx : "melakukan"
+book ||..o{ trx : "tercatat di"
+
+@enduml
