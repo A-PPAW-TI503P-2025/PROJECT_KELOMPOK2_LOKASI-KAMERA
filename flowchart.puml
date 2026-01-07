@@ -1,60 +1,119 @@
 @startuml
 
-'--- FLOWCHART 1: PEMINJAMAN BUKU (BORROW) ---
-title Flowchart 1: Peminjaman Buku (Fokus: Stok & Kamera)
+title Flowchart Sistem Peminjaman (Final: Admin Validasi + Logic Baru)
 
 start
-:User Login & Masuk Dashboard;
-:Pilih Menu Daftar Buku;
-repeat
-  :Pilih Buku yg Mau Dipinjam;
-  if (Stok Tersedia?) then (Tidak)
-    :Tampilkan: Stok Habis;
-  else (Ya)
-    break
-  endif
-repeat while (Stok Kosong?)
 
-:Request Izin Kamera;
+:Buka Aplikasi Website;
 
-if (Izin Diberikan?) then (Tidak)
-  :Error: Kamera Wajib Aktif;
-  stop
+'--- ALUR REGISTER ---
+if (Sudah Punya Akun?) then (Tidak)
+  :Menu Register;
+  repeat
+    :Input Name, NIM, Email, Password;
+    if (Validasi: Email/NIM ada?) then (Ya/Error)
+      :Alert "Akun sudah terdaftar";
+    else (Tidak)
+      break
+    endif
+  repeat while
+  :Simpan Data Akun;
 else (Ya)
-  :Buka Kamera Viewfinder;
-  :Ambil Foto Selfie/Bukti;
-  :Klik Tombol Pinjam;
-  :Simpan Data Peminjaman\n& Upload Foto (Database);
-  :Kurangi Stok Buku (Database);
-  :Tampilkan: Peminjaman Berhasil;
-  stop
 endif
 
-@enduml
+'--- ALUR LOGIN (AUTO LOOP) ---
+:Menu Login;
+repeat
+  :Input Email & Password;
+  :Cek Kredensial (Validasi);
+  if (Kredensial Valid?) then (Ya)
+    break
+  else (Tidak)
+    :Alert "Email/Password Salah";
+  endif
+repeat while
 
+:Ambil Data User & Role;
 
-@startuml
+'--- PERCABANGAN ROLE ---
+if (Apakah Role == Admin?) then (Ya)
+  
+  '=== DASHBOARD ADMIN ===
+  partition "Dashboard Admin" {
+    :Masuk Dashboard Admin;
+    repeat
+      :Pilih Menu (Navbar);
+      
+      if (Menu == Kelola Buku?) then (Ya)
+        :Tampilkan Daftar Buku;
+        :Lakukan CRUD (Tambah/Edit/Hapus);
+        :Update Database Buku;
+      
+      '--- TAMBAHAN: VALIDASI BUKTI ---
+      elseif (Menu == Laporan Peminjaman?) then (Ya)
+        :Lihat Tabel Laporan;
+        :Cek Detail Peminjaman;
+        :Validasi Bukti Foto & Lokasi User; 
+        ' (Ini langkah tambahan yang kamu minta)
+        
+      elseif (Menu == Logout?) then (Ya)
+        break
+      endif
+    repeat while (Kembali ke Menu)
+  }
 
-'--- FLOWCHART 2: PENGEMBALIAN BUKU (RETURN) ---
-title Flowchart 2: Pengembalian Buku (Fokus: Lokasi & Kamera)
+else (Tidak / Member)
 
-start
-:Pilih Menu Riwayat Peminjaman;
-:Pilih Transaksi Aktif;
-:Klik Tombol 'Kembalikan Buku';
-:System Request: Akses Lokasi GPS;
+  '=== DASHBOARD PEMINJAM ===
+  partition "Dashboard Peminjam" {
+    :Masuk Dashboard Peminjam;
+    repeat
+      :Pilih Menu (Navbar);
+      
+      '--- FITUR 1: PINJAM BUKU ---
+      if (Menu == Pinjam Buku?) then (Ya)
+        :Cari & Pilih Buku;
+        if (Stok Tersedia?) then (Tidak)
+          :Tampilkan Alert "Stok Habis";
+        else (Ya)
+          :Klik Tombol "Pinjam";
+          ' Logic: Kamera -> Foto & Lokasi
+          :Sistem Buka Kamera;
+          :User Ambil Foto Selfie (Bukti);
+          :Sistem Auto-Detect Lokasi User (GPS);
+          :Simpan Data Transaksi;
+          :Kurangi Stok Buku (-1);
+          :Tampilkan "Berhasil Pinjam";
+        endif
 
-if (Validasi Lokasi:\nUser di Area Perpus?) then (Tidak / Di Luar Area)
-  :Alert: Gagal! Anda harus berada\ndi Perpustakaan;
-  stop
-else (Ya / Di Dalam Area)
-  :Request Izin Kamera;
-  :Buka Kamera;
-  :Ambil Foto Kondisi Buku;
-  :Update Status: Dikembalikan\nSimpan Lokasi & Foto (Database);
-  :Tambah Stok Buku (Database);
-  :Tampilkan: Pengembalian Berhasil;
-  stop
+      '--- FITUR 2: KEMBALIKAN BUKU ---
+      elseif (Menu == Kembalikan Buku?) then (Ya)
+        :Pilih Buku di "Peminjaman Saya";
+        :Klik Tombol "Kembalikan";
+        ' Logic: Kamera -> Foto & Lokasi
+        :Sistem Buka Kamera;
+        :User Ambil Foto Kondisi Buku;
+        :Sistem Auto-Detect Lokasi User (GPS);
+        :Update Status "Dikembalikan";
+        :Tambah Stok Buku (+1);
+        :Tampilkan "Berhasil Kembali";
+
+      '--- FITUR 3: LIHAT RIWAYAT ---
+      elseif (Menu == Lihat Riwayat?) then (Ya)
+        :Tampilkan List Riwayat Peminjaman;
+      
+      '--- FITUR 4: LOGOUT ---
+      elseif (Menu == Logout?) then (Ya)
+        break
+      endif
+      
+    repeat while (Kembali ke Menu)
+  }
+
 endif
+
+'--- ENDING ---
+:Logout Akun;
+stop
 
 @enduml
