@@ -1,0 +1,76 @@
+@startuml
+title Activity Diagram Peminjam Buku
+
+|User|
+start
+:Login ke Sistem;
+:Masuk Dashboard Peminjam;
+:Pilih Menu;
+
+|Sistem|
+:Tampilkan Menu Peminjam;
+
+|User|
+if (Pilih Pinjam Buku?) then (Ya)
+    :Cari & Pilih Buku;
+endif
+
+|Sistem|
+:Validasi Pilihan Buku;
+:Kirim Permintaan Cek Stok;
+
+|Database|
+:Query Stok Buku;
+:Kirim Data Stok;
+
+|Sistem|
+if (Stok tersedia?) then (Tidak)
+    :Tampilkan "Stok Habis";
+else (Ya)
+    :Aktifkan Kamera;
+endif
+
+|User|
+:Ambil Foto Selfie (Bukti);
+
+|Sistem|
+:Ambil Lokasi User (GPS);
+:Kirim Data Transaksi;
+
+|Database|
+:Simpan Data Peminjaman;
+:Kurangi Stok Buku (-1);
+
+|Sistem|
+:Olah Data Peminjaman;
+:Tampilkan "Berhasil Pinjam";
+
+|User|
+if (Pilih Kembalikan Buku?) then (Ya)
+    :Pilih Buku di Peminjaman Saya;
+    :Klik Tombol Kembalikan;
+endif
+
+|Sistem|
+:Aktifkan Kamera;
+
+|User|
+:Ambil Foto Kondisi Buku;
+
+|Sistem|
+:Ambil Lokasi User (GPS);
+:Kirim Data Pengembalian;
+
+|Database|
+:Update Status Peminjaman;
+:Tambah Stok Buku (+1);
+
+|Sistem|
+:Olah Data Pengembalian;
+:Tampilkan "Berhasil Dikembalikan";
+
+|User|
+:Kembali ke Dashboard;
+:Logout;
+stop
+@enduml
