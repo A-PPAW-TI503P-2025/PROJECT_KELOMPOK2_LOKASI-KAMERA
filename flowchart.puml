@@ -1,29 +1,60 @@
-```mermaid
-flowchart TD
-    %% Node Shapes: ([Start/End]), [/Input/Output/], [Process], {Decision}, [(Database)]
+@startuml
 
-    Start([Mulai]) --> Login[/User Login & Masuk Dashboard/]
-    Login --> ListBuku[/Pilih Menu Daftar Buku/]
-    ListBuku --> PilihBuku[/Pilih Buku yg Mau Dipinjam/]
-    
-    PilihBuku --> CekStok{Stok Tersedia?}
-    
-    CekStok -- Tidak --> StokHabis[/Tampilkan: Stok Habis/]
-    StokHabis --> ListBuku
-    
-    CekStok -- Ya --> ReqKamera[Request Izin Kamera]
-    
-    ReqKamera --> IzinCam{Izin Diberikan?}
-    IzinCam -- Tidak --> ErrCam[/Error: Kamera Wajib Aktif/]
-    ErrCam --> End([Selesai])
-    
-    IzinCam -- Ya --> BukaCam[Buka Kamera Viewfinder]
-    BukaCam --> Foto[/Ambil Foto Selfie/Bukti/]
-    Foto --> KlikPinjam[Klik Tombol Pinjam]
-    
-    KlikPinjam --> DB_Pinjam[(Simpan Data Peminjaman\n& Upload Foto)]
-    DB_Pinjam --> DB_Stok[(Kurangi Stok Buku)]
-    
-    DB_Stok --> Sukses[/Tampilkan: Peminjaman Berhasil/]
-    Sukses --> End
-```
+'--- FLOWCHART 1: PEMINJAMAN BUKU (BORROW) ---
+title Flowchart 1: Peminjaman Buku (Fokus: Stok & Kamera)
+
+start
+:User Login & Masuk Dashboard;
+:Pilih Menu Daftar Buku;
+repeat
+  :Pilih Buku yg Mau Dipinjam;
+  if (Stok Tersedia?) then (Tidak)
+    :Tampilkan: Stok Habis;
+  else (Ya)
+    break
+  endif
+repeat while (Stok Kosong?)
+
+:Request Izin Kamera;
+
+if (Izin Diberikan?) then (Tidak)
+  :Error: Kamera Wajib Aktif;
+  stop
+else (Ya)
+  :Buka Kamera Viewfinder;
+  :Ambil Foto Selfie/Bukti;
+  :Klik Tombol Pinjam;
+  :Simpan Data Peminjaman\n& Upload Foto (Database);
+  :Kurangi Stok Buku (Database);
+  :Tampilkan: Peminjaman Berhasil;
+  stop
+endif
+
+@enduml
+
+
+@startuml
+
+'--- FLOWCHART 2: PENGEMBALIAN BUKU (RETURN) ---
+title Flowchart 2: Pengembalian Buku (Fokus: Lokasi & Kamera)
+
+start
+:Pilih Menu Riwayat Peminjaman;
+:Pilih Transaksi Aktif;
+:Klik Tombol 'Kembalikan Buku';
+:System Request: Akses Lokasi GPS;
+
+if (Validasi Lokasi:\nUser di Area Perpus?) then (Tidak / Di Luar Area)
+  :Alert: Gagal! Anda harus berada\ndi Perpustakaan;
+  stop
+else (Ya / Di Dalam Area)
+  :Request Izin Kamera;
+  :Buka Kamera;
+  :Ambil Foto Kondisi Buku;
+  :Update Status: Dikembalikan\nSimpan Lokasi & Foto (Database);
+  :Tambah Stok Buku (Database);
+  :Tampilkan: Pengembalian Berhasil;
+  stop
+endif
+
+@enduml
