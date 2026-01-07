@@ -2,60 +2,48 @@
 left to right direction
 skinparam packageStyle rectangle
 
-' --- Definisi Aktor ---
 actor "Peminjam" as user
 actor "Admin Pustakawan" as admin
 
-' --- Batas Sistem ---
-rectangle "Sistem Peminjaman Perpustakaan" {
+rectangle "Sistem Peminjaman Buku Perpustakaan" {
+    ' Use Case Peminjam
+    usecase "Registrasi User" as UC_Reg_User
+    usecase "Login User" as UC_Login_User
+    usecase "Kembalikan Buku" as UC_Return
+    usecase "Pinjam Buku" as UC_Borrow
+    usecase "Lihat Daftar Buku" as UC_Search
+    usecase "Logout User" as UC_Logout_User
+    usecase "Riwayat Peminjaman" as UC_History
 
-  ' --- Use Case Autentikasi (Modul 6 & 7) ---
-  usecase "Login" as UC_Login
-  usecase "Register Akun" as UC_Register
-  usecase "Logout" as UC_Logout
+    ' Use Case Admin
+    usecase "Registrasi Admin" as UC_Reg_Admin
+    usecase "Login Admin" as UC_Login_Admin
+    usecase "Logout Admin" as UC_Logout_Admin
+    usecase "Lihat Laporan" as UC_Report
+    usecase "Kelola Buku" as UC_Manage
 
-  ' --- Use Case User/Mahasiswa ---
-  usecase "Lihat Daftar & Stok Buku" as UC_Search
-  usecase "Pinjam Buku (Borrow)" as UC_Borrow
-  usecase "Kembalikan Buku (Return)" as UC_Return
-  usecase "Lihat Riwayat Peminjaman" as UC_History
-
-  ' --- Use Case Admin ---
-  usecase "Kelola Data Buku (CRUD)" as UC_ManageItems
-  usecase "Lihat Laporan Peminjaman" as UC_Report
-
-  ' --- Use Case Teknis (Fitur Utama Modul 9 & 10) ---
-  usecase "Ambil Foto Selfie (Bukti)" as UC_Selfie
-  usecase "Ambil & Validasi Lokasi" as UC_GPS
-
+    ' Use Case Teknis
+    usecase "Validasi Foto & Lokasi" as UC_Tech
 }
 
-' --- Relasi Aktor ke Use Case ---
+' --- Relasi Peminjam ---
+user --> UC_Reg_User
+UC_Reg_User ..> UC_Login_User : <<include>>
+UC_Login_User ..> UC_Return : <<include>>
+UC_Login_User ..> UC_Borrow : <<include>>
+UC_Login_User ..> UC_Search : <<include>>
+UC_Login_User ..> UC_Logout_User : <<include>>
+UC_Login_User ..> UC_History : <<include>>
 
-' User Interactions
-user --> UC_Register
-user --> UC_Login
-user --> UC_Logout
-user --> UC_Search
-user --> UC_Borrow
-user --> UC_Return
-user --> UC_History
+' --- Relasi Validasi ---
+UC_Return ..> UC_Tech : <<include>>
+UC_Borrow ..> UC_Tech : <<include>>
 
-' Admin Interactions
-admin --> UC_Login
-admin --> UC_Logout
-admin --> UC_ManageItems
-admin --> UC_Report
-
-' --- Relasi Include (Wajib Dilakukan) ---
-' Saat Pinjam atau Kembali, WAJIB Selfie & Cek Lokasi
-
-UC_Borrow ..> UC_Selfie : <<include>>
-UC_Borrow ..> UC_GPS : <<include>>
-
-UC_Return ..> UC_Selfie : <<include>>
-UC_Return ..> UC_GPS : <<include>>
-
-
+' --- Relasi Admin ---
+admin --> UC_Reg_Admin
+UC_Reg_Admin ..> UC_Login_Admin : <<include>>
+UC_Login_Admin ..> UC_Logout_Admin : <<include>>
+UC_Login_Admin ..> UC_Report : <<include>>
+UC_Login_Admin ..> UC_Manage : <<include>>
 
 @enduml
