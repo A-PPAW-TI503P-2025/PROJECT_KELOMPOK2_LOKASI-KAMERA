@@ -1,32 +1,119 @@
 @startuml
-skinparam ConditionEndStyle hline
 
-title Flowchart Peminjaman Buku (Sensor Kamera & Lokasi)
+title Flowchart Sistem Peminjaman (Final: Admin Validasi + Logic Baru)
 
 start
-:User Login & Masuk Dashboard;
-:Pilih Menu Daftar Buku;
-:Pilih Buku yg Mau Dipinjam;
 
-if (Stok Tersedia?) then (Ya)
-    :Request Izin Kamera & Lokasi;
-    if (Izin Diberikan?) then (Ya)
-        :Buka Kamera Viewfinder;
-        :Ambil Foto Selfie & Koordinat GPS;
-        :Klik Tombol Pinjam;
-        partition "Database Process" {
-            :Simpan Data Peminjaman,\nFoto & Lokasi;
-            :Update Stok Buku;
-        }
-        :Tampilkan: Peminjaman Berhasil;
+:Buka Aplikasi Website;
+
+'--- ALUR REGISTER ---
+if (Sudah Punya Akun?) then (Tidak)
+  :Menu Register;
+  repeat
+    :Input Name, NIM, Email, Password;
+    if (Validasi: Email/NIM ada?) then (Ya/Error)
+      :Alert "Akun sudah terdaftar";
     else (Tidak)
-        #pink:Error: Kamera & GPS Wajib Aktif;
-        detach
+      break
     endif
-else (Tidak)
-    #pink:Tampilkan: Stok Habis;
-    :Kembali ke Daftar Buku;
+  repeat while
+  :Simpan Data Akun;
+else (Ya)
 endif
 
+'--- ALUR LOGIN (AUTO LOOP) ---
+:Menu Login;
+repeat
+  :Input Email & Password;
+  :Cek Kredensial (Validasi);
+  if (Kredensial Valid?) then (Ya)
+    break
+  else (Tidak)
+    :Alert "Email/Password Salah";
+  endif
+repeat while
+
+:Ambil Data User & Role;
+
+'--- PERCABANGAN ROLE ---
+if (Apakah Role == Admin?) then (Ya)
+  
+  '=== DASHBOARD ADMIN ===
+  partition "Dashboard Admin" {
+    :Masuk Dashboard Admin;
+    repeat
+      :Pilih Menu (Navbar);
+      
+      if (Menu == Kelola Buku?) then (Ya)
+        :Tampilkan Daftar Buku;
+        :Lakukan CRUD (Tambah/Edit/Hapus);
+        :Update Database Buku;
+      
+      '--- TAMBAHAN: VALIDASI BUKTI ---
+      elseif (Menu == Laporan Peminjaman?) then (Ya)
+        :Lihat Tabel Laporan;
+        :Cek Detail Peminjaman;
+        :Validasi Bukti Foto & Lokasi User; 
+        ' (Ini langkah tambahan yang kamu minta)
+        
+      elseif (Menu == Logout?) then (Ya)
+        break
+      endif
+    repeat while (Kembali ke Menu)
+  }
+
+else (Tidak / Member)
+
+  '=== DASHBOARD PEMINJAM ===
+  partition "Dashboard Peminjam" {
+    :Masuk Dashboard Peminjam;
+    repeat
+      :Pilih Menu (Navbar);
+      
+      '--- FITUR 1: PINJAM BUKU ---
+      if (Menu == Pinjam Buku?) then (Ya)
+        :Cari & Pilih Buku;
+        if (Stok Tersedia?) then (Tidak)
+          :Tampilkan Alert "Stok Habis";
+        else (Ya)
+          :Klik Tombol "Pinjam";
+          ' Logic: Kamera -> Foto & Lokasi
+          :Sistem Buka Kamera;
+          :User Ambil Foto Selfie (Bukti);
+          :Sistem Auto-Detect Lokasi User (GPS);
+          :Simpan Data Transaksi;
+          :Kurangi Stok Buku (-1);
+          :Tampilkan "Berhasil Pinjam";
+        endif
+
+      '--- FITUR 2: KEMBALIKAN BUKU ---
+      elseif (Menu == Kembalikan Buku?) then (Ya)
+        :Pilih Buku di "Peminjaman Saya";
+        :Klik Tombol "Kembalikan";
+        ' Logic: Kamera -> Foto & Lokasi
+        :Sistem Buka Kamera;
+        :User Ambil Foto Kondisi Buku;
+        :Sistem Auto-Detect Lokasi User (GPS);
+        :Update Status "Dikembalikan";
+        :Tambah Stok Buku (+1);
+        :Tampilkan "Berhasil Kembali";
+
+      '--- FITUR 3: LIHAT RIWAYAT ---
+      elseif (Menu == Lihat Riwayat?) then (Ya)
+        :Tampilkan List Riwayat Peminjaman;
+      
+      '--- FITUR 4: LOGOUT ---
+      elseif (Menu == Logout?) then (Ya)
+        break
+      endif
+      
+    repeat while (Kembali ke Menu)
+  }
+
+endif
+
+'--- ENDING ---
+:Logout Akun;
 stop
+
 @enduml

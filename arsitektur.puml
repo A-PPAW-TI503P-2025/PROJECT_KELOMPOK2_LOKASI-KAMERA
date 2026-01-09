@@ -1,0 +1,30 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+title System Architecture Diagram - Peminjaman Perpustakaan (Sensor Based)
+
+Person(user, "Peminjam", "Mahasiswa/Member yang meminjam buku melalui browser HP.")
+Person(admin, "Admin Pustakawan", "Mengelola data buku dan memvalidasi bukti foto/lokasi.")
+
+System_Boundary(c1, "Sistem Perpustakaan Web") {
+    Container(web_app, "Web Application", "React/Vue/HTML/JS", "Menangani UI, akses Kamera (MediaDevices API), dan Lokasi (Geolocation API).")
+    Container(api, "API Application", "Laravel/Express/Node.js", "Menangani logika bisnis, validasi koordinat, dan pengolahan upload foto.")
+    ContainerDb(db, "Database", "MySQL/PostgreSQL", "Menyimpan metadata buku, user, koordinat GPS, dan path foto.")
+    Container(storage, "Image Storage", "Folder/Cloudinary/S3", "Tempat menyimpan file foto selfie asli.")
+}
+
+System_Ext(gps_api, "Google Maps / Browser GPS", "Menyediakan koordinat latitude & longitude.")
+
+' Relasi
+Rel(user, web_app, "Mengakses via Mobile Browser", "HTTPS")
+Rel(admin, web_app, "Mengakses via Desktop Browser", "HTTPS")
+
+Rel_D(web_app, gps_api, "Request Koordinat", "Browser API")
+Rel_D(web_app, api, "Kirim Data & Foto", "JSON/Multipart")
+
+Rel_R(api, db, "Read/Write Data", "SQL")
+Rel_L(api, storage, "Upload & Get Image", "File Stream")
+
+@enduml

@@ -1,0 +1,90 @@
+@startuml
+
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+hide circle
+
+' --- MODELS (DATABASE ENTITIES) ---
+
+class User {
+  - id : int
+  - nim : char
+  - nama : string
+  - email : string
+  - password : string
+  - role : enum
+  + register()
+  + login()
+}
+
+class Book {
+  - id : int
+  - title : string
+  - category : string
+  - stock : int
+  - cover_image : string
+  + create()
+  + findOne()
+  + updateStock()
+}
+
+class Transaction {
+  - id : int
+  - user_id : int
+  - book_id : int
+  - borrow_date : datetime
+  - return_date : datetime
+  - borrow_proof : string
+  - return_proof : string
+  - lat : decimal
+  - long : decimal
+  - status : enum
+  + createLoan()
+  + returnLoan()
+  + getHistory()
+}
+
+' --- CONTROLLERS (LOGIC) ---
+
+class TransactionController {
+  + borrowItem(req, res)
+  + returnItem(req, res)
+  + getMyHistory(req, res)
+}
+
+class AuthController {
+  + register(req, res)
+  + login(req, res)
+}
+
+' --- SERVICES/MIDDLEWARE (HELPER) ---
+
+class UploadService {
+  + uploadSelfie(image)
+}
+
+class LocationService {
+  + validateCoordinates(lat, long)
+}
+
+' --- RELATIONSHIPS ---
+
+' User bisa membuat banyak Transaksi
+User "1" -- "*" Transaction : makes >
+
+' Buku bisa ada di banyak Transaksi
+Book "1" -- "*" Transaction : recorded in >
+
+' Controller mengelola Model (Dependency)
+TransactionController ..> Transaction : manages
+TransactionController ..> Book : updates stock
+AuthController ..> User : manages
+
+' Transaksi menggunakan Service teknis
+Transaction ..> UploadService : uses (save proof)
+Transaction ..> LocationService : uses (check location)
+
+@enduml
