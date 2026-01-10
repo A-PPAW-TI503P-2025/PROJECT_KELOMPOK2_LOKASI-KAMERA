@@ -1,0 +1,102 @@
+@startuml
+title Activity Diagram Admin Pustakawan
+
+|Admin|
+start
+:Login ke Sistem;
+:Masuk Dashboard Admin;
+:Pilih Menu;
+
+|Sistem|
+:Tampilkan Menu Admin;
+
+|Admin|
+if (Kelola Buku?) then (Ya)
+    :Pilih Menu Kelola Buku;
+endif
+
+|Sistem|
+:Kirim Permintaan Data Buku;
+
+|Database|
+:Query Data Buku;
+:Kirim Data Buku;
+
+|Sistem|
+:Tampilkan Daftar Buku;
+
+|Admin|
+if (Tambah Buku?) then (Ya)
+    :Input Data Buku;
+endif
+
+|Sistem|
+:Validasi Data Buku;
+:Kirim Data Buku Baru;
+
+|Database|
+:Simpan Data Buku;
+
+|Sistem|
+:Tampilkan Notifikasi "Buku Ditambahkan";
+
+|Admin|
+if (Edit Buku?) then (Ya)
+    :Ubah Data Buku;
+endif
+
+|Sistem|
+:Validasi Perubahan;
+:Kirim Update Data Buku;
+
+|Database|
+:Update Data Buku;
+
+|Sistem|
+:Tampilkan Notifikasi "Buku Diperbarui";
+
+|Admin|
+if (Hapus Buku?) then (Ya)
+    :Pilih Buku;
+endif
+
+|Sistem|
+:Kirim Permintaan Hapus Buku;
+
+|Database|
+:Hapus Data Buku;
+
+|Sistem|
+:Tampilkan Notifikasi "Buku Dihapus";
+
+|Admin|
+if (Lihat Laporan?) then (Ya)
+    :Pilih Menu Laporan;
+endif
+
+|Sistem|
+:Tampilkan Opsi Laporan;
+:Validasi Permintaan Laporan;
+:Kirim Permintaan Data Laporan;
+
+|Database|
+:Query Data Laporan;
+:Kirim Data Laporan;
+
+|Sistem|
+:Olah Data Laporan;
+:Tampilkan Laporan;
+
+|Admin|
+if (Butuh Detail?) then (Ya)
+    :Pilih Detail Laporan;
+endif
+
+|Sistem|
+:Tampilkan Detail Laporan;
+
+|Admin|
+:Kembali ke Dashboard;
+:Logout;
+stop
+@enduml
