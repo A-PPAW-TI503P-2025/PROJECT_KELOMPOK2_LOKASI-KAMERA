@@ -1,0 +1,66 @@
+@startuml
+title Sequence Diagram
+title Admin Pustakawan – Kelola Buku & Laporan
+
+actor Admin
+participant "Sistem\n(Web/App)" as Sistem
+database "Database" as DB
+
+Admin -> Sistem : Login
+Sistem -> DB : Validasi akun admin
+DB --> Sistem : Data admin valid
+Sistem --> Admin : Tampilkan Dashboard Admin
+
+Admin -> Sistem : Pilih Menu Admin
+Sistem --> Admin : Tampilkan Menu Admin
+
+alt Kelola Buku
+    Admin -> Sistem : Pilih Menu Kelola Buku
+    Sistem -> DB : Request data buku
+    DB --> Sistem : Data buku
+    Sistem --> Admin : Tampilkan daftar buku
+
+    alt Tambah Buku
+        Admin -> Sistem : Input data buku
+        Sistem -> Sistem : Validasi data buku
+        Sistem -> DB : Simpan data buku
+        DB --> Sistem : Status berhasil
+        Sistem --> Admin : Notifikasi "Buku Ditambahkan"
+    end
+
+    alt Edit Buku
+        Admin -> Sistem : Ubah data buku
+        Sistem -> Sistem : Validasi perubahan
+        Sistem -> DB : Update data buku
+        DB --> Sistem : Status berhasil
+        Sistem --> Admin : Notifikasi "Buku Diperbarui"
+    end
+
+    alt Hapus Buku
+        Admin -> Sistem : Pilih buku
+        Sistem -> DB : Hapus data buku
+        DB --> Sistem : Status berhasil
+        Sistem --> Admin : Notifikasi "Buku Dihapus"
+    end
+end
+
+alt Lihat Laporan
+    Admin -> Sistem : Pilih Menu Laporan
+    Sistem --> Admin : Tampilkan opsi laporan
+    Admin -> Sistem : Pilih jenis laporan
+    Sistem -> Sistem : Validasi permintaan laporan
+    Sistem -> DB : Query data laporan
+    DB --> Sistem : Data laporan
+    Sistem -> Sistem : Olah data laporan
+    Sistem --> Admin : Tampilkan laporan
+
+    alt Lihat Detail Laporan
+        Admin -> Sistem : Pilih detail laporan
+        Sistem --> Admin : Tampilkan detail laporan
+    end
+end
+
+Admin -> Sistem : Logout
+Sistem --> Admin : Keluar dari sistem
+
+@enduml
