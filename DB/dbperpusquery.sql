@@ -1,3 +1,6 @@
+create database IF NOT EXISTS PerpustakaanDB_PAW;
+use PerpustakaanDB_PAW;
+
 -- 1. TABEL USERS
 CREATE TABLE Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
