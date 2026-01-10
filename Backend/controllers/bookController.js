@@ -1,13 +1,14 @@
 const { Book } = require("../models");
 
-exports.getAllBooks = async (req, res) => {
-  const books = await Book.findAll();
-  res.json(books);
-};
+module.exports = {
+  async getAll(req, res) {
+    const books = await Book.findAll();
+    res.json(books);
+  },
 
-exports.addBook = async (req, res) => {
-  const { judul, pengarang } = req.body;
-
-  const newBook = await Book.create({ judul, pengarang });
-  res.json({ message: "Buku ditambahkan", newBook });
+  async add(req, res) {
+    const { title, author, year, stock } = req.body;
+    const newBook = await Book.create({ title, author, year, stock });
+    res.json(newBook);
+  }
 };

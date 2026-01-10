@@ -1,15 +1,13 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const PORT = 3000;
+const { sequelize } = require("./models");
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send("Server backend jalan!");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-});
-
 app.use("/books", require("./routes/books"));
+app.use("/loan", require("./routes/loan"));
+
+sequelize.sync();
+
+app.listen(3000, () => console.log("Server running on port 3000"));
+app.use("/auth", require("./routes/auth"));
