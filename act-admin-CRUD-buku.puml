@@ -1,5 +1,5 @@
 @startuml
-title Activity Diagram Admin Pustakawan
+title Activity Diagram Admin Pustakawan (Tambah, Edit, Hapus Buku)
 
 |Admin|
 start
@@ -68,32 +68,6 @@ endif
 
 |Sistem|
 :Tampilkan Notifikasi "Buku Dihapus";
-
-|Admin|
-if (Lihat Laporan?) then (Ya)
-    :Pilih Menu Laporan;
-endif
-
-|Sistem|
-:Tampilkan Opsi Laporan;
-:Validasi Permintaan Laporan;
-:Kirim Permintaan Data Laporan;
-
-|Database|
-:Query Data Laporan;
-:Kirim Data Laporan;
-
-|Sistem|
-:Olah Data Laporan;
-:Tampilkan Laporan;
-
-|Admin|
-if (Butuh Detail?) then (Ya)
-    :Pilih Detail Laporan;
-endif
-
-|Sistem|
-:Tampilkan Detail Laporan;
 
 |Admin|
 :Kembali ke Dashboard;
