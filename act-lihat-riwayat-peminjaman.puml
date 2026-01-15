@@ -1,0 +1,19 @@
+@startuml
+title Activity Diagram - Lihat Riwayat Peminjaman
+
+|Peminjam|
+start
+:Pilih Menu Riwayat;
+
+|Sistem|
+:Request Data Transaksi (User ID);
+|Database|
+:Query riwayat peminjaman;
+|Sistem|
+:Tampilkan List Riwayat;
+if (Pilih Detail?) then (Ya)
+    :Tampilkan Detail (Status, Foto Bukti, Lokasi);
+else (Tidak)
+endif
+stop
+@enduml
