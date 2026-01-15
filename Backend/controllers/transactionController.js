@@ -1,4 +1,4 @@
-const { sequelize } = require("../models"); // Pastikan import sequelize instance
+const { sequelize, BorrowLog, User, Book } = require("../models"); // Pastikan import sequelize instance
 
 // 1. Controller PINJAM (Borrow)
 const borrowBook = async (req, res) => {
@@ -84,4 +84,32 @@ const returnBook = async (req, res) => {
   }
 };
 
-module.exports = { borrowBook, returnBook };
+const getAllTransactions = async (req, res) => {    try {
+      const transactions = await BorrowLog.findAll({
+        // JOIN ke tabel User dan Book agar data lengkap
+        include: [
+          {
+            model: User,
+            as: 'User', // Harus sesuai dengan alias di models/index.js
+            attributes: ['id', 'name', 'email', 'nim'] // Ambil kolom penting saja
+          },
+          {
+            model: Book,
+            as: 'Book', // Harus sesuai dengan alias di models/index.js
+            attributes: ['id', 'judul', 'pengarang']
+          }
+        ],
+        order: [['createdAt', 'DESC']] // Data terbaru di atas
+      });
+
+      res.status(200).json(transactions);
+    } catch (error) {
+      console.error("Error Get All:", error);
+      res.status(500).json({
+        message: "Gagal mengambil data laporan transaksi",
+        error: error.message
+      });
+    }
+};
+
+module.exports = { borrowBook, returnBook, getAllTransactions };

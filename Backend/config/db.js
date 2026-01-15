@@ -1,10 +1,9 @@
-const { Sequelize } = require('sequelize');
+const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize('PerpustakaanDB_PAW', 'root', 'Coldplayers06', {
-  host: 'localhost',
-  dialect: 'mysql',
-  port: 3308,  // ganti 3307 kalau MySQL-mu di 3307
-  logging: false
+const db = new Sequelize('perpustakaandb_paw', 'root', 'SandiMySQL24', {
+    host: 'localhost',
+    port: 3307,
+    dialect: 'mysql'
 });
 
-module.exports = sequelize;
+module.exports = db;
