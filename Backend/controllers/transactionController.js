@@ -1,87 +1,49 @@
-const { sequelize } = require("../models"); // Pastikan import sequelize instance
+const db = require("../config/db");
 
-// 1. Controller PINJAM (Borrow)
-const borrowBook = async (req, res) => {
-  try {
-    // Ambil data text dari body
-    const { email, title, lat, long } = req.body;
+module.exports = {
+  async borrowBook(req, res) {
+    try {
+      const { email, title, lat, long } = req.body;
+      const proofPath = req.file ? req.file.path : null; // Dari Multer
 
-    // Ambil path file dari Multer (Pastikan middleware upload udah jalan)
-    const proofPath = req.file ? req.file.path : null;
+      if (!proofPath)
+        return res.status(400).json({ message: "Foto bukti wajib!" });
 
-    if (!proofPath) {
-      return res.status(400).json({ message: "Foto bukti wajib diupload!" });
+      await db.execute("CALL sp_BorrowBook(?, ?, ?, ?, ?)", [
+        email,
+        title,
+        proofPath,
+        lat,
+        long,
+      ]);
+
+      res.json({ message: "Berhasil meminjam buku! Stok berkurang." });
+    } catch (err) {
+      res.status(400).json({ message: "Gagal meminjam", error: err.message });
     }
+  },
 
-    // PANGGIL STORED PROCEDURE PINJAM
-    await sequelize.query(
-      "CALL sp_BorrowBook(:email, :title, :proof, :lat, :long)",
-      {
-        replacements: {
-          email: email,
-          title: title,
-          proof: proofPath,
-          lat: lat,
-          long: long,
-        },
-      }
-    );
+  async returnBook(req, res) {
+    try {
+      const { email, title, lat, long } = req.body;
+      const proofPath = req.file ? req.file.path : null;
 
-    res.status(201).json({
-      success: true,
-      message: "Berhasil meminjam buku! Stok otomatis berkurang.",
-    });
-  } catch (error) {
-    // Tangkap Error custom dari Database (SIGNAL SQLSTATE)
-    res.status(400).json({
-      success: false,
-      message: "Gagal meminjam",
-      error: error.original ? error.original.sqlMessage : error.message,
-    });
-  }
-};
+      if (!proofPath)
+        return res.status(400).json({ message: "Foto bukti wajib!" });
 
-// 2. Controller KEMBALI (Return)
-const returnBook = async (req, res) => {
-  try {
-    const { email, title, lat, long } = req.body;
+      await db.execute("CALL sp_ReturnBook(?, ?, ?, ?, ?)", [
+        email,
+        title,
+        proofPath,
+        lat,
+        long,
+      ]);
 
-    // Ambil file bukti pengembalian (Foto kondisi buku pas balik)
-    const returnProofPath = req.file ? req.file.path : null;
-
-    if (!returnProofPath) {
-      return res
+      res.json({ message: "Buku berhasil dikembalikan! Stok bertambah." });
+    } catch (err) {
+      res
         .status(400)
-        .json({ message: "Foto bukti pengembalian wajib diupload!" });
+        .json({ message: "Gagal mengembalikan", error: err.message });
     }
-
-    // PANGGIL STORED PROCEDURE KEMBALI
-    await sequelize.query(
-      "CALL sp_ReturnBook(:email, :title, :proof, :lat, :long)",
-      {
-        replacements: {
-          email: email,
-          title: title,
-          proof: returnProofPath,
-          lat: lat,
-          long: long,
-        },
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Buku berhasil dikembalikan! Stok otomatis bertambah.",
-    });
-  } catch (error) {
-    console.error("Error Return:", error);
-
-    res.status(400).json({
-      success: false,
-      message: "Gagal mengembalikan buku",
-      error: error.original ? error.original.sqlMessage : error.message,
-    });
-  }
+  },
 };
-
-module.exports = { borrowBook, returnBook };

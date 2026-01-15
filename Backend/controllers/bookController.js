@@ -1,24 +1,27 @@
-const { Book } = require("../models");
+const db = require("../config/db");
 
 module.exports = {
   async getAll(req, res) {
     try {
-      const books = await Book.findAll();
+      const [books] = await db.execute("SELECT * FROM Books");
       res.json(books);
     } catch (err) {
-      console.error("Error fetching books:", err);
-      res.status(500).json({ message: "Gagal mengambil data buku", error: err.message });
+      res.status(500).json({ message: "Gagal ambil buku", error: err.message });
     }
   },
 
   async add(req, res) {
     try {
-      const { judul, pengarang, status } = req.body;
-      const newBook = await Book.create({ judul, pengarang, status });
-      res.json(newBook);
+      const { title, author, year, stock, category } = req.body; // Sesuaikan kolom DB
+      await db.execute(
+        "INSERT INTO Books (title, author, year, stock, category) VALUES (?, ?, ?, ?, ?)",
+        [title, author, year, stock, category]
+      );
+      res.json({ message: "Buku berhasil ditambahkan" });
     } catch (err) {
-      console.error("Error adding book:", err);
-      res.status(500).json({ message: "Gagal menambah buku", error: err.message });
+      res
+        .status(500)
+        .json({ message: "Gagal tambah buku", error: err.message });
     }
-  }
+  },
 };

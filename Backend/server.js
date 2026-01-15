@@ -1,28 +1,20 @@
 const express = require("express");
 const app = express();
-const sequelize = require('./config/db'); // pakai ini saja
+const path = require("path");
 
-// Sync database
-sequelize.sync({ alter: true })
-  .then(() => {
-    console.log('Database connected & synced');
-  })
-  .catch((err) => {
-    console.error('Database error:', err);
-  });
-
+// Middleware parsing body
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Agar folder uploads bisa diakses (buat lihat bukti foto)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
-app.use("/books", require("./routes/books"));
-app.use("/loan", require("./routes/loan"));
-app.use("/transaction", require("./routes/borrow"));
 app.use("/auth", require("./routes/auth"));
+app.use("/books", require("./routes/books"));
+app.use("/transaction", require("./routes/transaction")); // Pakai yang baru
 
+// Jalankan Server
 app.listen(3000, () => {
-  console.log(`Server running at: http://localhost:3000`);
-});
-
-app.get('/', (req, res) => {
-  res.send('Selamat datang di server Perpustakaan!');
+  console.log(`🚀 Server running at: http://localhost:3000`);
 });

@@ -1,10 +1,15 @@
-const { Sequelize } = require('sequelize');
+const mysql = require("mysql2/promise");
 
-const sequelize = new Sequelize('PerpustakaanDB_PAW', 'root', 'Coldplayers06', {
-  host: 'localhost',
-  dialect: 'mysql',
-  port: 3308,  // ganti 3307 kalau MySQL-mu di 3307
-  logging: false
+const db = mysql.createPool({
+  host: "localhost",
+  user: "root",
+  password: "Aquarius13",
+  database: "PerpustakaanDB_PAW",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-module.exports = sequelize;
+console.log("✅ Database Connected");
+
+module.exports = db;
