@@ -3,7 +3,7 @@ const app = express();
 const sequelize = require('./config/db'); // pakai ini saja
 
 // Sync database
-sequelize.sync()
+sequelize.sync({ alter: true })
   .then(() => {
     console.log('Database connected & synced');
   })
@@ -16,6 +16,7 @@ app.use(express.json());
 // Routes
 app.use("/books", require("./routes/books"));
 app.use("/loan", require("./routes/loan"));
+app.use("/transaction", require("./routes/borrow"));
 app.use("/auth", require("./routes/auth"));
 
 app.listen(3000, () => {

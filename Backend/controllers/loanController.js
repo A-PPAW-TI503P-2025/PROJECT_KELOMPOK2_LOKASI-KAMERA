@@ -2,15 +2,20 @@ const { BookLoan, Book } = require("../models");
 
 module.exports = {
   async borrow(req, res) {
-    const { userId, bookId } = req.body;
+    try {
+      const { userId, bookId } = req.body;
 
-    await BookLoan.create({
-      userId,
-      bookId,
-      loanDate: new Date(),
-      status: "Dipinjam"
-    });
+      const newLoan = await BookLoan.create({
+        userId,
+        bookId,
+        loanDate: new Date(),
+        status: "Dipinjam"
+      });
 
-    res.json({ message: "Berhasil meminjam buku!" });
+      res.json({ message: "Berhasil meminjam buku!", data: newLoan });
+    } catch (err) {
+      console.error("Error borrowing book:", err);
+      res.status(500).json({ message: "Gagal meminjam buku", error: err.message });
+    }
   }
 };

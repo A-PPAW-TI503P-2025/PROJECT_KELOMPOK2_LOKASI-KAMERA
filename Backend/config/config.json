@@ -1,10 +1,10 @@
 {
   "development": {
     "username": "root",
-    "password": "Telagasari15",
+    "password": "Coldplayers06",
     "database": "PerpustakaanDB_PAW",
     "host": "127.0.0.1",
-    "port": 3307,
+    "port": 3308,
     "dialect": "mysql"
   },
   "test": {
