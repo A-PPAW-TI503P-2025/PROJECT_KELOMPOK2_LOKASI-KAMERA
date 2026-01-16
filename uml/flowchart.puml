@@ -1,0 +1,104 @@
+@startuml
+
+title Flowchart Sistem Peminjaman (Final Update: Dashboard & Akses Cepat)
+
+start
+
+:Buka Aplikasi Website;
+
+'--- ALUR REGISTER ---
+if (Sudah Punya Akun?) then (Tidak)
+  :Menu Register;
+  repeat
+    :Input Name, NIM, Email, Password;
+    if (Validasi: Email/NIM ada?) then (Ya/Error)
+      :Alert "Akun sudah terdaftar";
+    else (Tidak)
+      break
+    endif
+  repeat while
+  :Simpan Data Akun;
+else (Ya)
+endif
+
+'--- ALUR LOGIN ---
+:Menu Login;
+repeat
+  :Input Email & Password;
+  :Cek Kredensial (Validasi);
+  if (Kredensial Valid?) then (Ya)
+    break
+  else (Tidak)
+    :Alert "Email/Password Salah";
+  endif
+repeat while
+
+:Ambil Data User & Role;
+
+'--- PERCABANGAN ROLE ---
+if (Apakah Role == Admin?) then (Ya)
+  
+  '=== DASHBOARD ADMIN ===
+  partition "Dashboard Admin" {
+    :Masuk Dashboard Admin;
+    repeat
+      :Pilih Menu (Navbar);
+      
+      if (Pilih Dashboard) then (Ya)
+        :Tampilkan Halaman Dashboard;
+        :Pilih Akses Cepat;
+        :Tambah Buku Baru dan Cek Validasi Peminjaman;
+
+      elseif (Menu == Kelola Buku?) then (Ya)
+        :Tampilkan Daftar Buku;
+        :Lakukan CRUD (Tambah/Edit/Hapus);
+        :Simpan Buku;
+      
+      elseif (Menu == Laporan & Validasi?) then (Ya)
+        :Tampilkan Daftar Laporan Peminjaman;
+        
+      elseif (Menu == Logout?) then (Ya)
+        break
+      endif
+    repeat while (Kembali ke Dashboard)
+  }
+
+else (Tidak / Member)
+
+  '=== DASHBOARD MAHASISWA ===
+  partition "Dashboard Mahasiswa" {
+    :Masuk Dashboard Mahasiswa;
+    repeat
+      :Pilih Menu (Navbar);
+      
+      if (Menu == Daftar Buku?) then (Ya)
+        :Melihat Daftar Buku;
+        :Pilih Buku untuk Peminjaman;
+        :Klik Tombol "Pinjam";
+        :Sistem Buka Kamera;
+        :Konfirmasi Peminjaman Lokasi dan Kamera;
+        :User Ambil Foto Selfie dengan Buku dan Lokasi;
+        :Update Status "Dipinjam";
+
+      elseif (Menu == Peminjaman Saya) then (Ya)
+        :Melihat Daftar Peminjaman Aktif;
+        :Klik Tombol "Proses Penegembalian";
+        :Sistem Buka Kamera;
+        :User Ambil Foto Selfie dengan Buku dan Lokasi;
+        :Konfirmasi Pengembalian Lokasi dan Kamera;
+        :Kembali ke halaman peminjaman saya;
+      
+      elseif (Menu == Logout?) then (Ya)
+        break
+      endif
+      
+    repeat while (Kembali ke Menu)
+  }
+
+endif
+
+'--- ENDING ---
+:Logout Akun;
+stop
+
+@enduml
