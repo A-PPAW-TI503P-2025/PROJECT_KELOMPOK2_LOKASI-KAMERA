@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
 
 const Register = () => {
+  // --- LOGIKA (TETAP SAMA) ---
   const [formData, setFormData] = useState({
     nama: "",
     nim: "",
@@ -15,40 +16,22 @@ const Register = () => {
 
   const validateInput = (name, value) => {
     let errors = { ...validationErrors };
-
-    // 1. Validasi Nama
     if (name === "nama") {
-      if (value.length < 5) {
-        errors.nama = "Nama minimal 5 karakter";
-      } else {
-        delete errors.nama;
-      }
+      if (value.length < 5) errors.nama = "Nama minimal 5 karakter";
+      else delete errors.nama;
     }
-
-    // 2. Validasi NIM (Hanya jika diisi)
     if (name === "nim") {
-      if (!value) {
-        delete errors.nim; // Hapus error jika kosong
-      } else {
-        if (!/^\d+$/.test(value)) {
-          errors.nim = "NIM harus berupa angka";
-        } else if (value.length !== 11) {
-          errors.nim = "NIM harus tepat 11 digit";
-        } else {
-          delete errors.nim;
-        }
+      if (!value) delete errors.nim;
+      else {
+        if (!/^\d+$/.test(value)) errors.nim = "NIM harus berupa angka";
+        else if (value.length !== 11) errors.nim = "NIM harus tepat 11 digit";
+        else delete errors.nim;
       }
     }
-
-    // 3. Validasi Email
     if (name === "email") {
-      if (!value.endsWith("@mail.umy.ac.id")) {
-        errors.email = "Wajib gunakan email kampus (@mail.umy.ac.id)";
-      } else {
-        delete errors.email;
-      }
+      if (!value.endsWith("@mail.umy.ac.id")) errors.email = "Wajib gunakan email kampus (@mail.umy.ac.id)";
+      else delete errors.email;
     }
-
     setValidationErrors(errors);
   };
 
@@ -60,124 +43,126 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Cek error validasi
     if (Object.keys(validationErrors).length > 0) {
-      setError("Mohon perbaiki data yang merah sebelum daftar.");
+      setError("Mohon perbaiki data yang merah.");
       return;
     }
-
     try {
       await api.post("/auth/register", formData);
       alert("Registrasi Berhasil! Silakan Login.");
       navigate("/");
     } catch (err) {
-      console.error(err);
-      const msg =
-        err.response?.data?.message ||
-        "Gagal daftar. Cek koneksi atau data duplikat.";
-      setError(msg);
+      setError(err.response?.data?.message || "Gagal daftar.");
     }
   };
 
+  const isButtonDisabled = Object.keys(validationErrors).length > 0 || !formData.email || !formData.password || !formData.nama;
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded shadow-md">
-        <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
-          Daftar Akun
-        </h2>
+    // 1. BACKGROUND LEBIH PINK (Pink-200 ke Pink-100)
+    <div className="font-sans min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-200 via-pink-100 to-white relative overflow-hidden py-10">
+      
+      {/* 2. BOLA DEKORASI (Warna Lebih Tebal biar Kelihatan) */}
+      <div className="absolute top-[-50px] left-[-50px] w-96 h-96 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+      <div className="absolute bottom-[-50px] right-[-50px] w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+      <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000"></div>
+
+      {/* 3. KARTU KACA (Lebih Bening) */}
+      <div className="relative w-full max-w-lg p-8 m-4 
+                      bg-white/30                 /* Putih Transparan 30% (Bening) */
+                      backdrop-blur-xl            /* Efek Blur Kuat */
+                      border border-white/60      /* Border Putih */
+                      rounded-[40px]              
+                      shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]">
+        
+        <div className="mb-6 text-center">
+          <h2 className="text-3xl font-bold text-gray-800 tracking-wide drop-shadow-sm">
+            Join Us! <span className="text-pink-500">🌸</span>
+          </h2>
+          <p className="text-gray-600 mt-2 text-sm font-medium">
+            Gabung komunitas perpustakaan UMY ✨
+          </p>
+        </div>
 
         {error && (
-          <div className="p-2 mb-4 text-sm text-red-700 bg-red-100 rounded text-center">
+          <div className="mb-4 p-3 bg-red-100/80 border border-red-200 text-red-600 rounded-2xl text-center text-sm font-bold">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Input Nama */}
-          <div>
+          <div className="group">
+            <label className="block mb-1 text-sm font-bold text-gray-600 ml-3">Nama Lengkap</label>
             <input
               type="text"
               name="nama"
-              placeholder="Nama Lengkap (Min. 5 Huruf)"
-              className={`w-full p-2 border rounded ${
-                validationErrors.nama ? "border-red-500" : "border-gray-300"
-              }`}
+              placeholder="Min. 5 Huruf"
+              className={`w-full px-6 py-3 bg-white/50 border rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:bg-white/80 transition-all duration-300 shadow-sm
+                ${validationErrors.nama ? "border-red-300 ring-red-200" : "border-white/50 focus:ring-pink-300"}`}
               onChange={handleChange}
             />
-            {validationErrors.nama && (
-              <p className="text-xs text-red-500 mt-1">
-                {validationErrors.nama}
-              </p>
-            )}
+            {validationErrors.nama && <p className="text-xs text-red-500 mt-1 ml-4 font-bold">{validationErrors.nama}</p>}
           </div>
 
-          {/* Input NIM - SUDAH DIPERBAIKI (Tidak ada 'required') */}
-          <div>
+          {/* Input NIM */}
+          <div className="group">
+            <label className="block mb-1 text-sm font-bold text-gray-600 ml-3">NIM <span className="text-gray-400 font-normal text-xs">(Opsional)</span></label>
             <input
               type="text"
               name="nim"
-              placeholder="NIM (Opsional - 11 Digit)" 
-              className={`w-full p-2 border rounded ${
-                validationErrors.nim ? "border-red-500" : "border-gray-300"
-              }`}
+              placeholder="11 Digit Angka"
+              className={`w-full px-6 py-3 bg-white/50 border rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:bg-white/80 transition-all duration-300 shadow-sm
+                ${validationErrors.nim ? "border-red-300 ring-red-200" : "border-white/50 focus:ring-pink-300"}`}
               onChange={handleChange}
             />
-            {validationErrors.nim && (
-              <p className="text-xs text-red-500 mt-1">
-                {validationErrors.nim}
-              </p>
-            )}
+            {validationErrors.nim && <p className="text-xs text-red-500 mt-1 ml-4 font-bold">{validationErrors.nim}</p>}
           </div>
 
           {/* Input Email */}
-          <div>
+          <div className="group">
+            <label className="block mb-1 text-sm font-bold text-gray-600 ml-3">Email Kampus</label>
             <input
               type="email"
               name="email"
-              placeholder="Email Kampus (@mail.umy.ac.id)"
-              className={`w-full p-2 border rounded ${
-                validationErrors.email ? "border-red-500" : "border-gray-300"
-              }`}
+              placeholder="nama@mail.umy.ac.id"
+              className={`w-full px-6 py-3 bg-white/50 border rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:bg-white/80 transition-all duration-300 shadow-sm
+                ${validationErrors.email ? "border-red-300 ring-red-200" : "border-white/50 focus:ring-pink-300"}`}
               onChange={handleChange}
               required
             />
-            {validationErrors.email && (
-              <p className="text-xs text-red-500 mt-1">
-                {validationErrors.email}
-              </p>
-            )}
+            {validationErrors.email && <p className="text-xs text-red-500 mt-1 ml-4 font-bold">{validationErrors.email}</p>}
           </div>
 
           {/* Input Password */}
-          <div>
+          <div className="group">
+            <label className="block mb-1 text-sm font-bold text-gray-600 ml-3">Password</label>
             <input
               type="password"
               name="password"
-              placeholder="Password"
-              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Buat password aman..."
+              className="w-full px-6 py-3 bg-white/50 border border-white/50 rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:bg-white/80 transition-all duration-300 shadow-sm"
               onChange={handleChange}
               required
             />
           </div>
 
+          {/* Tombol Daftar */}
           <button
             type="submit"
-            disabled={Object.keys(validationErrors).length > 0}
-            className={`w-full p-2 font-bold text-white rounded transition 
-              ${
-                Object.keys(validationErrors).length > 0
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700"
-              }`}
+            disabled={isButtonDisabled}
+            className={`w-full py-4 mt-4 rounded-full font-bold text-lg shadow-lg transition-all duration-300
+              ${isButtonDisabled 
+                ? "bg-gray-300/50 text-gray-500 cursor-not-allowed shadow-none" 
+                : "bg-gradient-to-r from-pink-400 to-pink-600 text-white shadow-pink-400/40 hover:shadow-pink-400/60 hover:scale-[1.02]"}`}
           >
-            Daftar
+            Daftar Sekarang
           </button>
         </form>
 
-        <p className="mt-4 text-sm text-center">
+        <p className="mt-8 text-center text-gray-600 text-sm font-medium">
           Sudah punya akun?{" "}
-          <Link to="/" className="text-blue-500 hover:underline">
+          <Link to="/" className="font-bold text-pink-500 hover:text-pink-700 underline decoration-2 underline-offset-4 transition-colors">
             Login disini
           </Link>
         </p>
