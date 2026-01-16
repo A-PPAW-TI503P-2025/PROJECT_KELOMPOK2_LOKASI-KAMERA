@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api";
-import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 
 const DashboardAdmin = () => {
@@ -11,16 +10,29 @@ const DashboardAdmin = () => {
     recentTransactions: []
   });
   
+  // 1. DEFAULT USER (Kalau belum login, namanya "Admin")
+  const [user, setUser] = useState({ nama: "Admin", role: "admin" });
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    // 2. AMBIL DATA USER DARI LOCALSTORAGE
+    // Logika ini sama persis dengan yang ada di Member/Mahasiswa
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Gagal membaca data user", error);
+      }
+    }
+
     const fetchData = async () => {
       try {
         const booksRes = await api.get("/books");
-        const transRes = await api.get("/transaction/history"); // Pastikan endpoint ini mengarah ke controller baru tadi
+        const transRes = await api.get("/transaction/history");
         
-        // Data transaksi dari SQL biasanya sudah terurut kalau query-nya pakai ORDER BY
-        // Tapi kita urutkan lagi di sini untuk memastikan
+        // Sorting data transaksi terbaru
         const sortedTrans = transRes.data; 
 
         setStats({
@@ -36,10 +48,9 @@ const DashboardAdmin = () => {
     fetchData();
   }, []);
 
-  // Filter Search Logic (Updated property name)
+  // Filter Search Logic
   const filteredTransactions = stats.recentTransactions.filter((item) => {
       if (!searchTerm) return true;
-      // Cek judul_buku (dari SQL) atau title (cadangan)
       const title = item.judul_buku || item.title || "";
       return title.toLowerCase().includes(searchTerm.toLowerCase());
   });
@@ -62,10 +73,16 @@ const DashboardAdmin = () => {
           </div>
           <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-full border border-pink-50 shadow-sm">
              <div className="w-10 h-10 rounded-full bg-pink-100 p-1">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=random&color=fff" alt="Admin" className="rounded-full" />
+                {/* AVATAR DINAMIS: Sesuai Inisial Nama */}
+                <img 
+                  src={`https://ui-avatars.com/api/?name=${user.nama}&background=random&color=fff`} 
+                  alt="Admin" 
+                  className="rounded-full" 
+                />
              </div>
              <div className="hidden md:block">
-                <p className="text-sm font-bold text-gray-700">Administrator</p>
+                {/* NAMA ADMIN (Pojok Kanan Atas) */}
+                <p className="text-sm font-bold text-gray-700">{user.nama}</p>
                 <p className="text-xs text-pink-400">Super User</p>
              </div>
           </div>
@@ -75,14 +92,16 @@ const DashboardAdmin = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
            <div className="lg:col-span-2 bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 rounded-[35px] p-8 relative overflow-hidden shadow-xl shadow-pink-200 text-white">
               <div className="relative z-10">
-                 <h2 className="text-3xl font-bold mb-2">Halo, Admin Cantik! 👋</h2>
+                 {/* SAPAAN DINAMIS (Halo, [Nama User]!) */}
+                 {/* Kalau kode ini benar terpasang, tulisan "Admin Cantik" PASTI HILANG */}
+                 <h2 className="text-3xl font-bold mb-2">Halo, {user.nama}! 👋</h2>
+                 
                  <p className="text-pink-50 mb-6 max-w-md">Ada <span className="font-bold bg-white/20 px-2 rounded">{stats.activeLoans} peminjaman aktif</span> yang perlu kamu cek hari ini. Semangat!</p>
-                 <Link to="/admin/laporan" className="bg-white text-pink-600 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-pink-50 shadow-md transition">Cek Laporan</Link>
               </div>
               <div className="absolute right-0 bottom-0 w-64 h-64 bg-yellow-300 rounded-full mix-blend-overlay filter blur-3xl opacity-40 transform translate-x-10 translate-y-10"></div>
            </div>
 
-           {/* Quick Stats */}
+           {/* Quick Stats (Bagian Kanan) */}
            <div className="space-y-4">
               <div className="bg-white p-5 rounded-[25px] shadow-sm border border-pink-50 flex items-center justify-between">
                  <div>
@@ -117,9 +136,8 @@ const DashboardAdmin = () => {
                           {item.status === 'dipinjam' ? '⏳' : '↩️'}
                        </div>
                        <div>
-                          {/* PERBAIKAN UTAMA DISINI: item.judul_buku */}
                           <h4 className="font-bold text-gray-800 text-sm">
-                              {item.judul_buku || item.title || "Judul Tidak Ditemukan"}
+                             {item.judul_buku || item.title || "Judul Tidak Ditemukan"}
                           </h4>
                           <p className="text-xs text-gray-400">{new Date(item.createdAt || item.borrow_date).toLocaleDateString()}</p>
                        </div>

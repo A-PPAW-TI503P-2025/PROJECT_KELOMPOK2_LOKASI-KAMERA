@@ -4,7 +4,9 @@ import Navbar from "./Navbar";
 
 const KelolaBuku = () => {
   const [books, setBooks] = useState([]);
-  const [form, setForm] = useState({ title: "", author: "", year: "", stock: "", category: "", cover_image: "" });
+  const initialFormState = { title: "", author: "", year: "", stock: "", category: "", cover_image: "" };
+  const [form, setForm] = useState(initialFormState);
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -20,8 +22,23 @@ const KelolaBuku = () => {
   useEffect(() => { fetchBooks(); }, []);
 
   const handleEdit = (book) => {
-    setForm({ title: book.title, author: book.author, year: book.year, stock: book.stock, category: book.category, cover_image: book.cover_image });
-    setIsEditing(true); setEditId(book.id); window.scrollTo({ top: 0, behavior: 'smooth' });
+    setForm({ 
+        title: book.title, 
+        author: book.author, 
+        year: book.year, 
+        stock: book.stock, 
+        category: book.category, 
+        cover_image: book.cover_image || "" 
+    });
+    setIsEditing(true); 
+    setEditId(book.id); 
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);       
+    setEditId(null);           
+    setForm(initialFormState); 
   };
 
   const handleDelete = async (id) => {
@@ -32,8 +49,11 @@ const KelolaBuku = () => {
     e.preventDefault();
     try {
       isEditing ? await api.put(`/books/${editId}`, form) : await api.post("/books", form);
-      alert("Berhasil!"); setForm({ title: "", author: "", year: "", stock: "", category: "", cover_image: "" });
-      setIsEditing(false); fetchBooks();
+      alert("Berhasil!"); 
+      setForm(initialFormState);
+      setIsEditing(false);
+      setEditId(null);
+      fetchBooks();
     } catch (err) { alert("Gagal simpan"); }
   };
 
@@ -47,8 +67,7 @@ const KelolaBuku = () => {
         <div className="bg-white p-8 rounded-[30px] shadow-sm border border-pink-50 mb-8">
           <div className="flex justify-between mb-6 border-b border-pink-50 pb-4">
              <h3 className="text-xl font-bold text-gray-700">{isEditing ? "Edit Buku" : "Tambah Buku Baru"}</h3>
-             {isEditing && <button onClick={() => setIsEditing(false)} className="text-pink-500 font-bold text-sm">Batal</button>}
-          </div>
+             {isEditing && <button onClick={handleCancel} className="text-pink-500 font-bold text-sm hover:text-pink-700 transition">Batal</button>}          </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
              <input className="input-pink" placeholder="Judul Buku" value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
              <input className="input-pink" placeholder="Penulis" value={form.author} onChange={e => setForm({...form, author: e.target.value})} required />

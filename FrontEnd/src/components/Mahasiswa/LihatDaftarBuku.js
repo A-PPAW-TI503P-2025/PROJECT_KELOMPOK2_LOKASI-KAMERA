@@ -92,10 +92,6 @@ const LihatDaftarBuku = () => {
                   Temukan buku impianmu & jelajahi dunia baru hari ini. 
                   Semuanya ada di genggamanmu!
                 </p>
-                <button className="bg-white text-purple-600 px-8 py-3 rounded-full font-bold shadow-lg hover:bg-purple-50 hover:scale-105 transition-all duration-300 text-sm flex items-center gap-2">
-                  Mulai Menjelajah
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                </button>
              </div>
              
              {/* Gambar Kartun 3D */}
@@ -112,7 +108,6 @@ const LihatDaftarBuku = () => {
           <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
              📚 Koleksi Populer
           </h3>
-          <button className="text-purple-500 text-sm font-semibold hover:text-purple-700 hover:underline transition-colors">Lihat Semua</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10">

@@ -18,6 +18,8 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
+      localStorage.setItem("nama", user.nama);
+
       if (user.role === "admin") {
         navigate("/admin/dashboard");
       } else {
@@ -32,13 +34,9 @@ const Login = () => {
     // 1. CONTAINER UTAMA (Background Gradasi Soft Pink)
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 via-white to-pink-50 relative overflow-hidden">
       
-      {/* 2. DEKORASI (PENTING: Biar Efek Kacanya Kelihatan) */}
-      {/* Bola Pink Kiri Atas */}
       <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob"></div>
-      {/* Bola Ungu/Pink Kanan Bawah */}
       <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob animation-delay-2000"></div>
 
-      {/* 3. KARTU GLASSMORPHISM (Efek Kaca Asli) */}
       <div className="relative w-full max-w-md p-8 m-4 
                       bg-white/30                 /* Warna Putih Transparan */
                       backdrop-blur-xl            /* Efek Blur (Kaca Buram) */
