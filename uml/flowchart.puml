@@ -76,13 +76,13 @@ else (Tidak / Member)
         :Pilih Buku untuk Peminjaman;
         :Klik Tombol "Pinjam";
         :Sistem Buka Kamera;
-        :Konfirmasi Peminjaman Lokasi dan Kamera;
         :User Ambil Foto Selfie dengan Buku dan Lokasi;
+        :Konfirmasi Peminjaman Lokasi dan Kamera;
         :Update Status "Dipinjam";
 
       elseif (Menu == Peminjaman Saya) then (Ya)
         :Melihat Daftar Peminjaman Aktif;
-        :Klik Tombol "Proses Penegembalian";
+        :Klik Tombol "Kembalikan Buku";
         :Sistem Buka Kamera;
         :User Ambil Foto Selfie dengan Buku dan Lokasi;
         :Konfirmasi Pengembalian Lokasi dan Kamera;
