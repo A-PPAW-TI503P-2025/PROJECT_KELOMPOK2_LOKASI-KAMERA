@@ -11,16 +11,17 @@ const DashboardAdmin = () => {
     recentTransactions: []
   });
   
-  // 1. Tambah State untuk Search
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const booksRes = await api.get("/books");
-        const transRes = await api.get("/transaction/history");
+        const transRes = await api.get("/transaction/history"); // Pastikan endpoint ini mengarah ke controller baru tadi
         
-        const sortedTrans = transRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Data transaksi dari SQL biasanya sudah terurut kalau query-nya pakai ORDER BY
+        // Tapi kita urutkan lagi di sini untuk memastikan
+        const sortedTrans = transRes.data; 
 
         setStats({
           totalBooks: booksRes.data.length,
@@ -35,10 +36,11 @@ const DashboardAdmin = () => {
     fetchData();
   }, []);
 
-  // 2. Logic Filtering (Mencari berdasarkan Judul Buku)
+  // Filter Search Logic (Updated property name)
   const filteredTransactions = stats.recentTransactions.filter((item) => {
-      if (!searchTerm) return true; // Kalau kosong, tampilkan semua
-      const title = item.Book?.title || "";
+      if (!searchTerm) return true;
+      // Cek judul_buku (dari SQL) atau title (cadangan)
+      const title = item.judul_buku || item.title || "";
       return title.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
@@ -50,7 +52,6 @@ const DashboardAdmin = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="relative w-96">
-             {/* 3. Pasang Value & OnChange di Input */}
              <input 
                 type="text" 
                 placeholder="Cari aktivitas buku..." 
@@ -100,11 +101,10 @@ const DashboardAdmin = () => {
            </div>
         </div>
 
-        {/* Transaksi Terbaru (Style Putih) */}
+        {/* Transaksi Terbaru */}
         <div className="bg-white p-8 rounded-[30px] border border-pink-50 shadow-sm">
            <h3 className="text-lg font-bold text-gray-800 mb-6">Aktivitas Terbaru</h3>
            <div className="space-y-4">
-              {/* 4. Tampilkan Hasil Filter, bukan data mentah */}
               {filteredTransactions.length === 0 ? (
                  <p className="text-center text-gray-400 py-4">
                     {searchTerm ? "Buku tidak ditemukan." : "Belum ada aktivitas."}
@@ -117,8 +117,11 @@ const DashboardAdmin = () => {
                           {item.status === 'dipinjam' ? '⏳' : '↩️'}
                        </div>
                        <div>
-                          <h4 className="font-bold text-gray-800 text-sm">{item.Book?.title || "Judul Buku"}</h4>
-                          <p className="text-xs text-gray-400">{new Date(item.createdAt).toLocaleDateString()}</p>
+                          {/* PERBAIKAN UTAMA DISINI: item.judul_buku */}
+                          <h4 className="font-bold text-gray-800 text-sm">
+                              {item.judul_buku || item.title || "Judul Tidak Ditemukan"}
+                          </h4>
+                          <p className="text-xs text-gray-400">{new Date(item.createdAt || item.borrow_date).toLocaleDateString()}</p>
                        </div>
                     </div>
                     <span className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase ${item.status === 'dipinjam' ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'}`}>
