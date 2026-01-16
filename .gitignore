@@ -1,3 +1,12 @@
+# 1. Dependency (WAJIB)
 node_modules/
+
+# 2. Folder Upload (Supaya foto tes kamu gak menuh-menuhin GitHub temen)
+uploads/
+
+# 3. Environment Variables (Kalau nanti pake .env)
 .env
-config.json
+
+# 4. System Files (Sampah sistem operasi)
+.DS_Store
+Thumbs.db

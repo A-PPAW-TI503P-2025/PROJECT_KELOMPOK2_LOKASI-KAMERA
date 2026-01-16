@@ -1,4 +1,5 @@
 @startuml
+<<<<<<< HEAD
 
 title Flowchart Sistem Peminjaman (Final Update: Dashboard & Akses Cepat)
 
@@ -100,5 +101,54 @@ endif
 '--- ENDING ---
 :Logout Akun;
 stop
+=======
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Mahasiswa" as user
+actor "Admin Pustakawan" as admin
+
+rectangle "Sistem Peminjaman Buku Perpustakaan" {
+    ' Use Case Mahasiswa
+    usecase "Registrasi User" as UC_Reg_User
+    usecase "Login User" as UC_Login_User
+    usecase "Kembalikan Buku" as UC_Return
+    usecase "Logout" as UC_Logout_User
+    usecase "Peminjaman Saya" as UC_Borrow
+    usecase "Daftar Buku" as UC_Search
+
+
+    ' Use Case Admin
+    usecase "Registrasi Admin" as UC_Reg_Admin
+    usecase "Login Admin" as UC_Login_Admin
+    usecase "Logout" as UC_Logout_Admin
+    usecase "Laporan & Validasi" as UC_Report
+    usecase "Kelola Buku" as UC_Manage
+    usecase "Dashboard" as UC_Dashboard
+
+    ' Use Case Teknis
+    usecase "Validasi Foto & Lokasi" as UC_Tech
+}
+
+' --- Relasi Peminjam ---
+user --> UC_Reg_User
+UC_Reg_User ..> UC_Login_User : <<include>>
+UC_Login_User ..> UC_Borrow : <<include>>
+UC_Login_User ..> UC_Search : <<include>>
+UC_Login_User ..> UC_Logout_User : <<include>>
+UC_Borrow ..> UC_Return : <<extend>>
+
+' --- Relasi Validasi ---
+UC_Return ..> UC_Tech : <<include>>
+UC_Borrow ..> UC_Tech : <<include>>
+
+' --- Relasi Admin ---
+admin --> UC_Reg_Admin
+UC_Reg_Admin ..> UC_Login_Admin : <<include>>
+UC_Login_Admin ..> UC_Logout_Admin : <<include>>
+UC_Login_Admin ..> UC_Report : <<include>>
+UC_Login_Admin ..> UC_Manage : <<include>>
+UC_Login_Admin ..> UC_Dashboard : <<include>>
+>>>>>>> 5a3f2714d14f5166d45d6654e4c2402eb08c00df
 
 @enduml

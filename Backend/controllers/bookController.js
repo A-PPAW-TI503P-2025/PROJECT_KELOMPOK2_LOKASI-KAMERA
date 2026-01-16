@@ -24,31 +24,5 @@ module.exports = {
         .json({ message: "Gagal tambah buku", error: err.message });
     }
   },
-
-  async updateBook(req, res) {
-    try {
-      const { id } = req.params;
-      const { title, author, year, category, stock } = req.body;
-
-      await db.execute(
-        "UPDATE Books SET title=?, author=?, year=?, category=?, stock=? WHERE id=?",
-        [title, author, year, category, stock, id]
-      );
-
-      res.json({ message: "Buku berhasil diupdate" });
-    } catch (err) {
-      res.status(500).json({ message: "Gagal update buku", error: err.message });
-    }
-  },
-
-  async deleteBook(req, res) {
-    try {
-      const { id } = req.params;
-      await db.execute("DELETE FROM Books WHERE id=?", [id]);
-      res.json({ message: "Buku berhasil dihapus" });
-    } catch (err) {
-      res.status(500).json({ message: "Gagal hapus buku", error: err.message });
-    }
-  },
 };
 

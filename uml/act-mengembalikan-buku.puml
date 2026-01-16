@@ -1,0 +1,22 @@
+@startuml
+title Activity Diagram - Mengembalikan Buku
+
+|Peminjam|
+start
+:Pilih Buku di "Peminjaman Saya";
+:Klik Tombol Kembalikan;
+
+|Sistem|
+:Aktifkan Kamera;
+|Peminjam|
+:Ambil Foto Kondisi Buku;
+|Sistem|
+:Auto-Detect Lokasi (GPS);
+|Database|
+:Update Status "Dikembalikan";
+:Update Return Date;
+:Tambah Stok Buku (+1);
+|Sistem|
+:Tampilkan "Berhasil Dikembalikan";
+stop
+@enduml

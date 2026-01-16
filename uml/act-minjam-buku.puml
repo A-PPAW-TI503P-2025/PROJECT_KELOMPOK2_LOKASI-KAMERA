@@ -1,0 +1,30 @@
+@startuml
+title Activity Diagram - Meminjam Buku
+
+|Peminjam|
+start
+:Cari & Pilih Buku;
+:Klik Tombol Pinjam;
+
+|Sistem|
+:Cek Stok di Database;
+|Database|
+:Query Stock;
+|Sistem|
+if (Stok > 0?) then (Ya)
+    :Aktifkan Kamera;
+    |Peminjam|
+    :Ambil Foto Selfie (Bukti);
+    |Sistem|
+    :Auto-Detect Lokasi (GPS);
+    :Kirim Data (Photo, Lat, Long);
+    |Database|
+    :Simpan Transaksi;
+    :Update Stok Buku (-1);
+    |Sistem|
+    :Tampilkan "Berhasil Pinjam";
+else (Tidak)
+    :Tampilkan Alert "Stok Habis";
+endif
+stop
+@enduml

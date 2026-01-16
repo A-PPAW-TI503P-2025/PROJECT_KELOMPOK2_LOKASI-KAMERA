@@ -1,0 +1,78 @@
+@startuml
+title Activity Diagram Admin Pustakawan (Tambah, Edit, Hapus Buku)
+
+|Admin|
+start
+:Login ke Sistem;
+:Masuk Dashboard Admin;
+
+|Sistem|
+:Tampilkan Menu Admin;
+
+|Admin|
+:Pilih Menu;
+
+|Admin|
+if (Kelola Buku?) then (Ya)
+    :Pilih Menu Kelola Buku;
+endif
+
+|Sistem|
+:Kirim Permintaan Data Buku;
+
+|Database|
+:Query Data Buku;
+:Kirim Data Buku;
+
+|Sistem|
+:Tampilkan Daftar Buku;
+
+|Admin|
+if (Tambah Buku?) then (Ya)
+    :Input Data Buku;
+endif
+
+|Sistem|
+:Validasi Data Buku;
+:Kirim Data Buku Baru;
+
+|Database|
+:Simpan Data Buku;
+
+|Sistem|
+:Tampilkan Notifikasi "Buku Ditambahkan";
+
+|Admin|
+if (Edit Buku?) then (Ya)
+    :Ubah Data Buku;
+endif
+
+|Sistem|
+:Validasi Perubahan;
+:Kirim Update Data Buku;
+
+|Database|
+:Update Data Buku;
+
+|Sistem|
+:Tampilkan Notifikasi "Buku Diperbarui";
+
+|Admin|
+if (Hapus Buku?) then (Ya)
+    :Pilih Buku;
+endif
+
+|Sistem|
+:Kirim Permintaan Hapus Buku;
+
+|Database|
+:Hapus Data Buku;
+
+|Sistem|
+:Tampilkan Notifikasi "Buku Dihapus";
+
+|Admin|
+:Kembali ke Dashboard;
+:Logout;
+stop
+@enduml

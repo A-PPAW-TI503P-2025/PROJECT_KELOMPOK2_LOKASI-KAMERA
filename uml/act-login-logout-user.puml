@@ -1,0 +1,36 @@
+@startuml
+title Activity Diagram - Login & Logout User
+
+|Peminjam|
+start
+:Buka Aplikasi;
+if (Sudah Punya Akun?) then (Tidak)
+  :Input Nama, NIM, Email, Password;
+  |Sistem|
+  :Validasi Data & Simpan ke Database;
+  |Peminjam|
+endif
+:Input Email & Password;
+
+|Sistem|
+repeat
+  :Validasi Kredensial;
+  if (Kredensial Valid?) then (Ya)
+    :Set Session Role 'Mahasiswa';
+    break
+  else (Tidak)
+    :Tampilkan Alert "Email/Password Salah";
+    |Peminjam|
+    :Input Ulang Email & Password;
+    |Sistem|
+  endif
+|Sistem|
+repeat while (Validasi)
+
+:Masuk Dashboard Peminjam;
+|Peminjam|
+:Pilih Logout;
+|Sistem|
+:Hapus Session & Keluar;
+stop
+@enduml

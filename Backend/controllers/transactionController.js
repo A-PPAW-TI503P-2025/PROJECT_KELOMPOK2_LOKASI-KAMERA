@@ -46,21 +46,4 @@ module.exports = {
         .json({ message: "Gagal mengembalikan", error: err.message });
     }
   },
-
-  
-  async getAllHistory(req, res) {
-    try {
-      const [rows] = await db.execute(`
-        SELECT t.*, u.nama AS peminjam, b.title AS judul_buku 
-        FROM Transactions t
-        JOIN Users u ON t.user_id = u.id
-        JOIN Books b ON t.book_id = b.id
-        ORDER BY t.createdAt DESC 
-      `);
-      res.json(rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Gagal ambil data", error: err.message });
-    }
-  },
 };
