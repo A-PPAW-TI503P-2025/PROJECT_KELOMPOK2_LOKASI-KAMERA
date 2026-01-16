@@ -1,115 +1,66 @@
-const { sequelize, BorrowLog, User, Book } = require("../models"); // Pastikan import sequelize instance
+const db = require("../config/db");
 
-// 1. Controller PINJAM (Borrow)
-const borrowBook = async (req, res) => {
-  try {
-    // Ambil data text dari body
-    const { email, title, lat, long } = req.body;
+module.exports = {
+  async borrowBook(req, res) {
+    try {
+      const { email, title, lat, long } = req.body;
+      const proofPath = req.file ? req.file.path : null; // Dari Multer
 
-    // Ambil path file dari Multer (Pastikan middleware upload udah jalan)
-    const proofPath = req.file ? req.file.path : null;
+      if (!proofPath)
+        return res.status(400).json({ message: "Foto bukti wajib!" });
 
-    if (!proofPath) {
-      return res.status(400).json({ message: "Foto bukti wajib diupload!" });
+      await db.execute("CALL sp_BorrowBook(?, ?, ?, ?, ?)", [
+        email,
+        title,
+        proofPath,
+        lat,
+        long,
+      ]);
+
+      res.json({ message: "Berhasil meminjam buku! Stok berkurang." });
+    } catch (err) {
+      res.status(400).json({ message: "Gagal meminjam", error: err.message });
     }
+  },
 
-    // PANGGIL STORED PROCEDURE PINJAM
-    await sequelize.query(
-      "CALL sp_BorrowBook(:email, :title, :proof, :lat, :long)",
-      {
-        replacements: {
-          email: email,
-          title: title,
-          proof: proofPath,
-          lat: lat,
-          long: long,
-        },
-      }
-    );
+  async returnBook(req, res) {
+    try {
+      const { email, title, lat, long } = req.body;
+      const proofPath = req.file ? req.file.path : null;
 
-    res.status(201).json({
-      success: true,
-      message: "Berhasil meminjam buku! Stok otomatis berkurang.",
-    });
-  } catch (error) {
-    // Tangkap Error custom dari Database (SIGNAL SQLSTATE)
-    res.status(400).json({
-      success: false,
-      message: "Gagal meminjam",
-      error: error.original ? error.original.sqlMessage : error.message,
-    });
-  }
-};
+      if (!proofPath)
+        return res.status(400).json({ message: "Foto bukti wajib!" });
 
-// 2. Controller KEMBALI (Return)
-const returnBook = async (req, res) => {
-  try {
-    const { email, title, lat, long } = req.body;
+      await db.execute("CALL sp_ReturnBook(?, ?, ?, ?, ?)", [
+        email,
+        title,
+        proofPath,
+        lat,
+        long,
+      ]);
 
-    // Ambil file bukti pengembalian (Foto kondisi buku pas balik)
-    const returnProofPath = req.file ? req.file.path : null;
-
-    if (!returnProofPath) {
-      return res
+      res.json({ message: "Buku berhasil dikembalikan! Stok bertambah." });
+    } catch (err) {
+      res
         .status(400)
-        .json({ message: "Foto bukti pengembalian wajib diupload!" });
+        .json({ message: "Gagal mengembalikan", error: err.message });
     }
+  },
 
-    // PANGGIL STORED PROCEDURE KEMBALI
-    await sequelize.query(
-      "CALL sp_ReturnBook(:email, :title, :proof, :lat, :long)",
-      {
-        replacements: {
-          email: email,
-          title: title,
-          proof: returnProofPath,
-          lat: lat,
-          long: long,
-        },
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Buku berhasil dikembalikan! Stok otomatis bertambah.",
-    });
-  } catch (error) {
-    console.error("Error Return:", error);
-
-    res.status(400).json({
-      success: false,
-      message: "Gagal mengembalikan buku",
-      error: error.original ? error.original.sqlMessage : error.message,
-    });
-  }
-};
-
-const getAllTransactions = async (req, res) => {    try {
-      const transactions = await BorrowLog.findAll({
-        // JOIN ke tabel User dan Book agar data lengkap
-        include: [
-          {
-            model: User,
-            as: 'User', // Harus sesuai dengan alias di models/index.js
-            attributes: ['id', 'name', 'email', 'nim'] // Ambil kolom penting saja
-          },
-          {
-            model: Book,
-            as: 'Book', // Harus sesuai dengan alias di models/index.js
-            attributes: ['id', 'judul', 'pengarang']
-          }
-        ],
-        order: [['createdAt', 'DESC']] // Data terbaru di atas
-      });
-
-      res.status(200).json(transactions);
-    } catch (error) {
-      console.error("Error Get All:", error);
-      res.status(500).json({
-        message: "Gagal mengambil data laporan transaksi",
-        error: error.message
-      });
+  
+  async getAllHistory(req, res) {
+    try {
+      const [rows] = await db.execute(`
+        SELECT t.*, u.nama AS peminjam, b.title AS judul_buku 
+        FROM Transactions t
+        JOIN Users u ON t.user_id = u.id
+        JOIN Books b ON t.book_id = b.id
+        ORDER BY t.createdAt DESC 
+      `);
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Gagal ambil data", error: err.message });
     }
+  },
 };
-
-module.exports = { borrowBook, returnBook, getAllTransactions };
