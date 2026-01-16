@@ -21,13 +21,17 @@ const Register = () => {
       else delete errors.nama;
     }
     if (name === "nim") {
-      if (!value) delete errors.nim;
-      else {
+      // Jika kosong, hapus error (artinya valid/boleh kosong)
+      if (!value || value.trim() === "") {
+        delete errors.nim; 
+      } else {
+        // Jika diisi, baru divalidasi formatnya
         if (!/^\d+$/.test(value)) errors.nim = "NIM harus berupa angka";
         else if (value.length !== 11) errors.nim = "NIM harus tepat 11 digit";
         else delete errors.nim;
       }
     }
+    
     if (name === "email") {
       if (!value.endsWith("@mail.umy.ac.id")) errors.email = "Wajib gunakan email kampus (@mail.umy.ac.id)";
       else delete errors.email;
@@ -47,8 +51,12 @@ const Register = () => {
       setError("Mohon perbaiki data yang merah.");
       return;
     }
+    const payload = {
+        ...formData,
+        nim: formData.nim && formData.nim.trim() !== "" ? formData.nim : null
+    };
     try {
-      await api.post("/auth/register", formData);
+      await api.post("/auth/register", payload);
       alert("Registrasi Berhasil! Silakan Login.");
       navigate("/");
     } catch (err) {
@@ -56,8 +64,12 @@ const Register = () => {
     }
   };
 
-  const isButtonDisabled = Object.keys(validationErrors).length > 0 || !formData.email || !formData.password || !formData.nama;
-
+const isButtonDisabled = 
+    Object.keys(validationErrors).length > 0 || 
+    !formData.email || 
+    !formData.password || 
+    !formData.nama;
+    
   return (
     // 1. BACKGROUND LEBIH PINK (Pink-200 ke Pink-100)
     <div className="font-sans min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-200 via-pink-100 to-white relative overflow-hidden py-10">
