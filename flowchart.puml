@@ -1,6 +1,6 @@
 @startuml
 
-title Flowchart Sistem Peminjaman (Final: Admin Validasi + Logic Baru)
+title Flowchart Sistem Peminjaman (Final Update: Dashboard & Akses Cepat)
 
 start
 
@@ -21,7 +21,7 @@ if (Sudah Punya Akun?) then (Tidak)
 else (Ya)
 endif
 
-'--- ALUR LOGIN (AUTO LOOP) ---
+'--- ALUR LOGIN ---
 :Menu Login;
 repeat
   :Input Email & Password;
@@ -44,65 +44,50 @@ if (Apakah Role == Admin?) then (Ya)
     repeat
       :Pilih Menu (Navbar);
       
-      if (Menu == Kelola Buku?) then (Ya)
+      if (Pilih Dashboard) then (Ya)
+        :Tampilkan Halaman Dashboard;
+        :Pilih Akses Cepat;
+        :Tambah Buku Baru dan Cek Validasi Peminjaman;
+
+      elseif (Menu == Kelola Buku?) then (Ya)
         :Tampilkan Daftar Buku;
         :Lakukan CRUD (Tambah/Edit/Hapus);
-        :Update Database Buku;
+        :Simpan Buku;
       
-      '--- TAMBAHAN: VALIDASI BUKTI ---
-      elseif (Menu == Laporan Peminjaman?) then (Ya)
-        :Lihat Tabel Laporan;
-        :Cek Detail Peminjaman;
-        :Validasi Bukti Foto & Lokasi User; 
-        ' (Ini langkah tambahan yang kamu minta)
+      elseif (Menu == Laporan & Validasi?) then (Ya)
+        :Tampilkan Daftar Laporan Peminjaman;
         
       elseif (Menu == Logout?) then (Ya)
         break
       endif
-    repeat while (Kembali ke Menu)
+    repeat while (Kembali ke Dashboard)
   }
 
 else (Tidak / Member)
 
-  '=== DASHBOARD PEMINJAM ===
-  partition "Dashboard Peminjam" {
-    :Masuk Dashboard Peminjam;
+  '=== DASHBOARD MAHASISWA ===
+  partition "Dashboard Mahasiswa" {
+    :Masuk Dashboard Mahasiswa;
     repeat
       :Pilih Menu (Navbar);
       
-      '--- FITUR 1: PINJAM BUKU ---
-      if (Menu == Pinjam Buku?) then (Ya)
-        :Cari & Pilih Buku;
-        if (Stok Tersedia?) then (Tidak)
-          :Tampilkan Alert "Stok Habis";
-        else (Ya)
-          :Klik Tombol "Pinjam";
-          ' Logic: Kamera -> Foto & Lokasi
-          :Sistem Buka Kamera;
-          :User Ambil Foto Selfie (Bukti);
-          :Sistem Auto-Detect Lokasi User (GPS);
-          :Simpan Data Transaksi;
-          :Kurangi Stok Buku (-1);
-          :Tampilkan "Berhasil Pinjam";
-        endif
-
-      '--- FITUR 2: KEMBALIKAN BUKU ---
-      elseif (Menu == Kembalikan Buku?) then (Ya)
-        :Pilih Buku di "Peminjaman Saya";
-        :Klik Tombol "Kembalikan";
-        ' Logic: Kamera -> Foto & Lokasi
+      if (Menu == Daftar Buku?) then (Ya)
+        :Melihat Daftar Buku;
+        :Pilih Buku untuk Peminjaman;
+        :Klik Tombol "Pinjam";
         :Sistem Buka Kamera;
-        :User Ambil Foto Kondisi Buku;
-        :Sistem Auto-Detect Lokasi User (GPS);
-        :Update Status "Dikembalikan";
-        :Tambah Stok Buku (+1);
-        :Tampilkan "Berhasil Kembali";
+        :Konfirmasi Peminjaman Lokasi dan Kamera;
+        :User Ambil Foto Selfie dengan Buku dan Lokasi;
+        :Update Status "Dipinjam";
 
-      '--- FITUR 3: LIHAT RIWAYAT ---
-      elseif (Menu == Lihat Riwayat?) then (Ya)
-        :Tampilkan List Riwayat Peminjaman;
+      elseif (Menu == Peminjaman Saya) then (Ya)
+        :Melihat Daftar Peminjaman Aktif;
+        :Klik Tombol "Proses Penegembalian";
+        :Sistem Buka Kamera;
+        :User Ambil Foto Selfie dengan Buku dan Lokasi;
+        :Konfirmasi Pengembalian Lokasi dan Kamera;
+        :Kembali ke halaman peminjaman saya;
       
-      '--- FITUR 4: LOGOUT ---
       elseif (Menu == Logout?) then (Ya)
         break
       endif
