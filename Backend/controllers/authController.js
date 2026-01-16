@@ -9,17 +9,13 @@ module.exports = {
     try {
       const { nama, email, password, nim } = req.body;
 
-      // ... validasi input lain ...
-
       const [rows] = await db.execute("SELECT * FROM Users WHERE email = ?", [email]);
       if (rows.length > 0) return res.status(400).json({ message: "Email sudah dipakai!" });
 
       const hashed = await bcrypt.hash(password, 10);
 
-      // --- PERBAIKAN DI SINI ---
       // Jika nim kosong ("") atau undefined, ubah jadi null
       const valueNim = nim && nim.trim() !== "" ? nim : null; 
-      // -------------------------
 
       await db.execute(
         "INSERT INTO Users (nama, email, password, nim, role) VALUES (?, ?, ?, ?, ?)",
