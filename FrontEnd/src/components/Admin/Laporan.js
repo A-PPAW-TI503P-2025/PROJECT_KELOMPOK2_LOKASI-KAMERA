@@ -5,6 +5,9 @@ import Navbar from "./Navbar";
 const Laporan = () => {
   const [transactions, setTransactions] = useState([]);
 
+  const [showModal, setShowModal] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -15,6 +18,22 @@ const Laporan = () => {
     };
     fetchData();
   }, []);
+
+  const handleViewPhoto = (photoPath) => {
+    if (photoPath) {
+      const cleanPath = photoPath.replace(/\\/g, "/");
+      
+      const fullUrl = `http://localhost:3000/${cleanPath}`;
+      
+      setSelectedImageUrl(fullUrl);
+      setShowModal(true);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedImageUrl(null);
+  };
 
   return (
     <div className="flex min-h-screen bg-[#FDF4FF] font-sans">
@@ -64,10 +83,13 @@ const Laporan = () => {
                       </span>
                   </td>
                   <td className="p-5 text-center">
-                      {t.borrow_proof ? (
-                          <a href={`http://localhost:5000/${t.borrow_proof.replace(/\\/g, "/")}`} target="_blank" rel="noreferrer" className="text-pink-500 hover:text-pink-700 text-xs font-bold underline flex items-center justify-center gap-1">
-                              📸 Foto
-                          </a>
+                     {t.borrow_proof ? (
+                      <button 
+                      onClick={() => handleViewPhoto(t.borrow_proof)}
+                      className="text-pink-500 hover:text-pink-700 text-xs font-bold underline flex items-center justify-center gap-1 mx-auto"
+                      >
+                        📸 Lihat Foto
+                        </button>
                       ) : <span className="text-gray-300 text-xs">-</span>}
                   </td>
                   <td className="p-5 text-center">
@@ -83,6 +105,41 @@ const Laporan = () => {
           </table>
         </div>
       </main>
+
+      {showModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={closeModal}
+        >
+          <div 
+            className="relative bg-white p-2 rounded-2xl max-w-4xl w-full shadow-2xl animate-scale-up"
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <button 
+              onClick={closeModal}
+              className="absolute -top-4 -right-4 bg-red-500 text-white w-10 h-10 rounded-full font-bold shadow-lg hover:bg-red-600 transition flex items-center justify-center z-10"
+            >
+              ✕
+            </button>
+
+            <div className="flex justify-center items-center bg-gray-100 rounded-xl overflow-hidden max-h-[80vh]">
+              <img 
+                src={selectedImageUrl} 
+                alt="Bukti Transaksi" 
+                className="max-w-full max-h-[80vh] object-contain"
+                onError={(e) => { 
+                   e.target.src = "https://via.placeholder.com/400?text=Gambar+Rusak/Server+Mati"; 
+                }} 
+              />
+            </div>
+            
+            <div className="mt-3 text-center">
+               <span className="text-xs text-gray-500">Mengambil dari: {selectedImageUrl}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
