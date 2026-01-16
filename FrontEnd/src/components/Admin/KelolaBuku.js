@@ -58,7 +58,6 @@ const KelolaBuku = () => {
                 <option value="">- Kategori -</option>
                 {categories.map(c => <option key={c.code} value={`${c.code} - ${c.name}`}>{c.name}</option>)}
              </select>
-             <input className="input-pink" placeholder="Link Cover Gambar (Opsional)" value={form.cover_image} onChange={e => setForm({...form, cover_image: e.target.value})} />
              
              <button type="submit" className="md:col-span-2 py-3 bg-gradient-to-r from-pink-400 to-rose-500 text-white rounded-xl font-bold shadow-md hover:shadow-pink-200 transition transform active:scale-95">
                 {isEditing ? "Simpan Perubahan" : "Tambah Buku"}
