@@ -1,0 +1,39 @@
+@startuml
+title Activity Diagram - Login & Logout
+
+|Mahasiswa/Pustakawan|
+start
+:Buka Halaman Login;
+
+repeat
+    :Input Email & Password;
+    
+|Sistem|
+    :Kirim Kredensial;
+    
+|Database|
+    :Validasi Akun;
+    
+|Sistem|
+    if (Kredensial Valid?) then (Ya)
+        :Set Session User & Role;
+        |Mahasiswa/Pustakawan|
+        :Masuk ke Dashboard;
+        :... Aktivitas di Dashboard ...;
+        :Klik Tombol Logout;
+        
+        |Sistem|
+        :Hapus Session;
+        :Redirect ke Halaman Login;
+        stop
+    else (Tidak)
+        |Sistem|
+        :Tampilkan Alert "Email/Password Salah";
+        |Mahasiswa/Pustakawan|
+        :Coba Lagi?;
+    endif
+backward :Kembali ke Form Login;
+repeat while (Pilih Ya?) is (Ya)
+->Tidak;
+stop
+@enduml
