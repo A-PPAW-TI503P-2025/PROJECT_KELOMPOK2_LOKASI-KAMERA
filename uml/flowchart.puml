@@ -1,104 +1,50 @@
 @startuml
+left to right direction
+skinparam packageStyle rectangle
 
-title Flowchart Sistem Peminjaman (Final Update: Dashboard & Akses Cepat)
+actor "Mahasiswa" as user
+actor "Admin Pustakawan" as admin
 
-start
+rectangle "Sistem Peminjaman Buku Perpustakaan" {
+    ' Use Case Mahasiswa
+    usecase "Registrasi User" as UC_Reg_User
+    usecase "Login User" as UC_Login_User
+    usecase "Kembalikan Buku" as UC_Return
+    usecase "Logout" as UC_Logout_User
+    usecase "Peminjaman Saya" as UC_Borrow
+    usecase "Daftar Buku" as UC_Search
 
-:Buka Aplikasi Website;
 
-'--- ALUR REGISTER ---
-if (Sudah Punya Akun?) then (Tidak)
-  :Menu Register;
-  repeat
-    :Input Name, NIM, Email, Password;
-    if (Validasi: Email/NIM ada?) then (Ya/Error)
-      :Alert "Akun sudah terdaftar";
-    else (Tidak)
-      break
-    endif
-  repeat while
-  :Simpan Data Akun;
-else (Ya)
-endif
+    ' Use Case Admin
+    usecase "Registrasi Admin" as UC_Reg_Admin
+    usecase "Login Admin" as UC_Login_Admin
+    usecase "Logout" as UC_Logout_Admin
+    usecase "Laporan & Validasi" as UC_Report
+    usecase "Kelola Buku" as UC_Manage
+    usecase "Dashboard" as UC_Dashboard
 
-'--- ALUR LOGIN ---
-:Menu Login;
-repeat
-  :Input Email & Password;
-  :Cek Kredensial (Validasi);
-  if (Kredensial Valid?) then (Ya)
-    break
-  else (Tidak)
-    :Alert "Email/Password Salah";
-  endif
-repeat while
+    ' Use Case Teknis
+    usecase "Validasi Foto & Lokasi" as UC_Tech
+}
 
-:Ambil Data User & Role;
+' --- Relasi Peminjam ---
+user --> UC_Reg_User
+UC_Reg_User ..> UC_Login_User : <<include>>
+UC_Login_User ..> UC_Borrow : <<include>>
+UC_Login_User ..> UC_Search : <<include>>
+UC_Login_User ..> UC_Logout_User : <<include>>
+UC_Borrow ..> UC_Return : <<extend>>
 
-'--- PERCABANGAN ROLE ---
-if (Apakah Role == Admin?) then (Ya)
-  
-  '=== DASHBOARD ADMIN ===
-  partition "Dashboard Admin" {
-    :Masuk Dashboard Admin;
-    repeat
-      :Pilih Menu (Navbar);
-      
-      if (Pilih Dashboard) then (Ya)
-        :Tampilkan Halaman Dashboard;
-        :Pilih Akses Cepat;
-        :Tambah Buku Baru dan Cek Validasi Peminjaman;
+' --- Relasi Validasi ---
+UC_Return ..> UC_Tech : <<include>>
+UC_Borrow ..> UC_Tech : <<include>>
 
-      elseif (Menu == Kelola Buku?) then (Ya)
-        :Tampilkan Daftar Buku;
-        :Lakukan CRUD (Tambah/Edit/Hapus);
-        :Simpan Buku;
-      
-      elseif (Menu == Laporan & Validasi?) then (Ya)
-        :Tampilkan Daftar Laporan Peminjaman;
-        
-      elseif (Menu == Logout?) then (Ya)
-        break
-      endif
-    repeat while (Kembali ke Dashboard)
-  }
-
-else (Tidak / Member)
-
-  '=== DASHBOARD MAHASISWA ===
-  partition "Dashboard Mahasiswa" {
-    :Masuk Dashboard Mahasiswa;
-    repeat
-      :Pilih Menu (Navbar);
-      
-      if (Menu == Daftar Buku?) then (Ya)
-        :Melihat Daftar Buku;
-        :Pilih Buku untuk Peminjaman;
-        :Klik Tombol "Pinjam";
-        :Sistem Buka Kamera;
-        :Konfirmasi Peminjaman Lokasi dan Kamera;
-        :User Ambil Foto Selfie dengan Buku dan Lokasi;
-        :Update Status "Dipinjam";
-
-      elseif (Menu == Peminjaman Saya) then (Ya)
-        :Melihat Daftar Peminjaman Aktif;
-        :Klik Tombol "Proses Penegembalian";
-        :Sistem Buka Kamera;
-        :User Ambil Foto Selfie dengan Buku dan Lokasi;
-        :Konfirmasi Pengembalian Lokasi dan Kamera;
-        :Kembali ke halaman peminjaman saya;
-      
-      elseif (Menu == Logout?) then (Ya)
-        break
-      endif
-      
-    repeat while (Kembali ke Menu)
-  }
-
-endif
-
-'--- ENDING ---
-:Logout Akun;
-stop
+' --- Relasi Admin ---
+admin --> UC_Reg_Admin
+UC_Reg_Admin ..> UC_Login_Admin : <<include>>
+UC_Login_Admin ..> UC_Logout_Admin : <<include>>
+UC_Login_Admin ..> UC_Report : <<include>>
+UC_Login_Admin ..> UC_Manage : <<include>>
+UC_Login_Admin ..> UC_Dashboard : <<include>>
 
 @enduml
