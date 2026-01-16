@@ -5,10 +5,12 @@ title Activity Diagram Admin Pustakawan (Tambah, Edit, Hapus Buku)
 start
 :Login ke Sistem;
 :Masuk Dashboard Admin;
-:Pilih Menu;
 
 |Sistem|
 :Tampilkan Menu Admin;
+
+|Admin|
+:Pilih Menu;
 
 |Admin|
 if (Kelola Buku?) then (Ya)
