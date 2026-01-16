@@ -1,0 +1,35 @@
+@startuml
+title Activity Diagram - Registrasi Mahasiswa
+
+|Mahasiswa|
+start
+:Buka Halaman Register;
+
+repeat
+    :Input Nama, NIM, Email, dan Password;
+    
+    |Sistem|
+    :Kirim Data Registrasi;
+    
+    |Database|
+    :Cek Ketersediaan Email/NIM;
+    
+    |Sistem|
+    if (Email/NIM Sudah Terdaftar?) then (Ya)
+        :Tampilkan Alert "Akun sudah dipakai";
+        |Mahasiswa|
+    else (Tidak)
+        |Database|
+        :Simpan Data Akun Baru;
+        |Sistem|
+        :Tampilkan Notifikasi "Registrasi Berhasil";
+        :Redirect ke Halaman Login;
+        stop
+    endif
+
+|Mahasiswa|
+repeat while (Input Data Ulang?) is (Ya)
+->Tidak;
+
+stop
+@enduml
