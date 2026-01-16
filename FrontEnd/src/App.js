@@ -11,6 +11,7 @@ import KelolaBuku from "./components/Admin/KelolaBuku";
 import Laporan from "./components/Admin/Laporan";
 
 // Member Components (Folder 'Mahasiswa')
+// PERHATIKAN: Path-nya sekarang pakai 'Mahasiswa'
 import LihatDaftarBuku from "./components/Mahasiswa/LihatDaftarBuku";
 import PinjamBuku from "./components/Mahasiswa/PinjamBuku";
 import KembalikanBuku from "./components/Mahasiswa/KembalikanBuku";
